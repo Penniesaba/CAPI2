@@ -1,0 +1,648 @@
+{% extends "base.html" %}
+
+{% block title %}API文档 - 密码算法实现平台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-book me-2"></i>API文档</h1>
+        <p class="lead">密码算法实现平台提供了一系列RESTful API，便于第三方应用集成使用。</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>API概述</h5>
+    </div>
+    <div class="card-body">
+        <p>所有API请求均使用POST方法，请求和响应数据均为JSON格式。API响应的统一格式如下：</p>
+        <pre class="bg-light p-3 rounded">
+{
+  "success": true/false,
+  "data": { ... },   // 成功时返回的数据
+  "message": "..."   // 失败时的错误信息
+}
+        </pre>
+        <p>所有API请求应当设置请求头：<code>Content-Type: application/json</code></p>
+    </div>
+</div>
+
+<!-- 对称加密API -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-key me-2"></i>对称加密API</h5>
+    </div>
+    <div class="card-body">
+        <h4>AES加密</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/symmetric/aes-encrypt</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>plaintext</code>: 要加密的明文</li>
+                            <li><code>key</code>: Base64编码的密钥</li>
+                            <li><code>mode</code>: 加密模式，可选值：ECB, CBC, CFB, OFB, CTR</li>
+                            <li><code>iv</code>: Base64编码的初始向量（CBC, CFB, OFB, CTR模式需要）</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "ciphertext": "Base64编码的密文"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>示例</th>
+                    <td>
+                        <pre>
+# 请求
+{
+  "plaintext": "Hello, World!",
+  "key": "c2l4dGVlbiBieXRlIGtleQ==",  // "sixteen byte key"
+  "mode": "CBC",
+  "iv": "c2l4dGVlbiBieXRlIGl2Lg=="    // "sixteen byte iv."
+}
+
+# 响应
+{
+  "success": true,
+  "data": {
+    "ciphertext": "8Y23t7SHvZSp7qZOuCXKnA=="
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">AES解密</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/symmetric/aes-decrypt</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>ciphertext</code>: Base64编码的密文</li>
+                            <li><code>key</code>: Base64编码的密钥</li>
+                            <li><code>mode</code>: 解密模式，可选值：ECB, CBC, CFB, OFB, CTR</li>
+                            <li><code>iv</code>: Base64编码的初始向量（CBC, CFB, OFB, CTR模式需要）</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "plaintext": "解密后的明文"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 哈希算法API -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-hashtag me-2"></i>哈希算法API</h5>
+    </div>
+    <div class="card-body">
+        <h4>基本哈希算法</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td>
+                        <ul>
+                            <li><code>/api/hash/sha1</code></li>
+                            <li><code>/api/hash/sha256</code></li>
+                            <li><code>/api/hash/sha3-256</code></li>
+                            <li><code>/api/hash/sha3-512</code></li>
+                            <li><code>/api/hash/ripemd160</code></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>message</code>: 要计算哈希的消息</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "hash": "十六进制格式的哈希值"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>示例</th>
+                    <td>
+                        <pre>
+# 请求
+{
+  "message": "Hello, World!"
+}
+
+# 响应
+{
+  "success": true,
+  "data": {
+    "hash": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">HMAC算法</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td>
+                        <ul>
+                            <li><code>/api/hash/hmac-sha1</code></li>
+                            <li><code>/api/hash/hmac-sha256</code></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>message</code>: 要计算HMAC的消息</li>
+                            <li><code>key</code>: 密钥</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "hmac": "十六进制格式的HMAC值"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>示例</th>
+                    <td>
+                        <pre>
+# 请求
+{
+  "message": "Hello, World!",
+  "key": "secret-key"
+}
+
+# 响应
+{
+  "success": true,
+  "data": {
+    "hmac": "5b35f8dcc94a41863cfc6bd2d133bf1a99eb6430"  // HMAC-SHA1示例
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">PBKDF2密钥派生</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/hash/pbkdf2</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>password</code>: 原始密码</li>
+                            <li><code>salt</code>: Base64编码的盐值 (可选，如不提供则随机生成)</li>
+                            <li><code>iterations</code>: 迭代次数 (可选，默认10000)</li>
+                            <li><code>key_length</code>: 生成的密钥长度，单位为字节 (可选，默认32)</li>
+                            <li><code>hash_function</code>: 使用的哈希函数，可选值: "sha1", "sha256" (可选，默认"sha256")</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "derived_key": "Base64编码的派生密钥",
+    "salt": "Base64编码的盐值",
+    "iterations": 10000,
+    "key_length": 32,
+    "hash_function": "sha256"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>示例</th>
+                    <td>
+                        <pre>
+# 请求
+{
+  "password": "my-secure-password",
+  "iterations": 15000,
+  "key_length": 32,
+  "hash_function": "sha256"
+}
+
+# 响应
+{
+  "success": true,
+  "data": {
+    "derived_key": "AE82HJpFsZRf9J+KjKwQv8ZQ9xT+xNj5KsUJkmR7qJk=",
+    "salt": "Ml+6n0LRuq5bAWL6jVSjZQ==",
+    "iterations": 15000,
+    "key_length": 32,
+    "hash_function": "sha256"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">PBKDF2密钥验证</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/hash/pbkdf2-verify</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>password</code>: 要验证的密码</li>
+                            <li><code>derived_key</code>: Base64编码的已派生密钥</li>
+                            <li><code>salt</code>: Base64编码的盐值</li>
+                            <li><code>iterations</code>: 迭代次数</li>
+                            <li><code>key_length</code>: 密钥长度，单位为字节</li>
+                            <li><code>hash_function</code>: 使用的哈希函数，可选值: "sha1", "sha256"</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "verified": true/false
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+                <tr>
+                    <th>示例</th>
+                    <td>
+                        <pre>
+# 请求
+{
+  "password": "my-secure-password",
+  "derived_key": "AE82HJpFsZRf9J+KjKwQv8ZQ9xT+xNj5KsUJkmR7qJk=",
+  "salt": "Ml+6n0LRuq5bAWL6jVSjZQ==",
+  "iterations": 15000,
+  "key_length": 32,
+  "hash_function": "sha256"
+}
+
+# 响应
+{
+  "success": true,
+  "data": {
+    "verified": true
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 编码算法API -->
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-code me-2"></i>编码算法API</h5>
+    </div>
+    <div class="card-body">
+        <h4>Base64编码</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/encoding/base64-encode</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>text</code>: 要编码的文本</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "encoded": "Base64编码后的文本"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">Base64解码</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/encoding/base64-decode</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>encoded</code>: Base64编码的文本</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "text": "解码后的原始文本"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 非对称加密API -->
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="fas fa-unlock-alt me-2"></i>非对称加密API</h5>
+    </div>
+    <div class="card-body">
+        <h4>RSA生成密钥对</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/asymmetric/rsa-generate-keypair</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>key_size</code>: 密钥长度，单位为位，例如2048</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "private_key": "PEM格式的私钥",
+    "public_key": "PEM格式的公钥"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">RSA加密</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/asymmetric/rsa-encrypt</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>plaintext</code>: 要加密的明文</li>
+                            <li><code>public_key</code>: PEM格式的公钥</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "ciphertext": "Base64编码的密文"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 class="mt-4">RSA解密</h4>
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <tr>
+                    <th>URL</th>
+                    <td><code>/api/asymmetric/rsa-decrypt</code></td>
+                </tr>
+                <tr>
+                    <th>方法</th>
+                    <td>POST</td>
+                </tr>
+                <tr>
+                    <th>请求参数</th>
+                    <td>
+                        <ul>
+                            <li><code>ciphertext</code>: Base64编码的密文</li>
+                            <li><code>private_key</code>: PEM格式的私钥</li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <th>响应</th>
+                    <td>
+                        <pre>
+{
+  "success": true,
+  "data": {
+    "plaintext": "解密后的明文"
+  }
+}
+                        </pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-code me-2"></i>API使用示例</h5>
+    </div>
+    <div class="card-body">
+        <h4>Python示例</h4>
+        <pre class="bg-light p-3 rounded">
+import requests
+import json
+import base64
+
+# SHA256哈希计算
+def calculate_sha256():
+    url = "http://localhost:5000/api/hash/sha256"
+    data = {"message": "Hello, World!"}
+    headers = {"Content-Type": "application/json"}
+    
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    result = response.json()
+    
+    if result["success"]:
+        print(f"SHA256哈希值: {result['data']['hash']}")
+    else:
+        print(f"错误: {result['message']}")
+
+# AES加密
+def aes_encrypt():
+    url = "http://localhost:5000/api/symmetric/aes-encrypt"
+    key = base64.b64encode(b"sixteen byte key").decode('utf-8')
+    iv = base64.b64encode(b"sixteen byte iv.").decode('utf-8')
+    
+    data = {
+        "plaintext": "需要加密的数据",
+        "key": key,
+        "mode": "CBC",
+        "iv": iv
+    }
+    
+    headers = {"Content-Type": "application/json"}
+    
+    response = requests.post(url, data=json.dumps(data), headers=headers)
+    result = response.json()
+    
+    if result["success"]:
+        print(f"加密结果: {result['data']['ciphertext']}")
+    else:
+        print(f"错误: {result['message']}")
+
+# 调用示例函数
+calculate_sha256()
+aes_encrypt()
+        </pre>
+    </div>
+</div>
+{% endblock %} 

@@ -6,7 +6,7 @@
 <div class="row mb-4">
     <div class="col-md-12">
         <h1><i class="fas fa-hashtag me-2"></i>哈希算法</h1>
-        <p class="lead">哈希算法将任意长度的数据映射为固定长度的散列值，具有单向性和抗碰撞性。</p>
+        <p class="lead">哈希算法将任意长度的信息转换为固定长度的输出，具有单向性和抗碰撞性。</p>
     </div>
 </div>
 
@@ -14,17 +14,17 @@
 <ul class="nav nav-pills mb-4" id="hashTabs" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" id="hash-tab" data-bs-toggle="pill" data-bs-target="#hash" type="button" role="tab" aria-controls="hash" aria-selected="true">
-            <i class="fas fa-hashtag me-1"></i>基本哈希函数
+            <i class="fas fa-fingerprint me-1"></i>基本哈希函数
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="hmac-tab" data-bs-toggle="pill" data-bs-target="#hmac" type="button" role="tab" aria-controls="hmac" aria-selected="false">
-            <i class="fas fa-signature me-1"></i>HMAC
+            <i class="fas fa-signature me-1"></i>HMAC (消息认证码)
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" id="pbkdf2-tab" data-bs-toggle="pill" data-bs-target="#pbkdf2" type="button" role="tab" aria-controls="pbkdf2" aria-selected="false">
-            <i class="fas fa-key me-1"></i>PBKDF2
+            <i class="fas fa-key me-1"></i>PBKDF2 (密钥派生)
         </button>
     </li>
 </ul>
@@ -34,66 +34,103 @@
     <!-- 基本哈希函数标签页 -->
     <div class="tab-pane fade show active" id="hash" role="tabpanel" aria-labelledby="hash-tab">
         <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-hashtag me-2"></i>基本哈希函数</h5>
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-fingerprint me-2"></i>哈希函数</h5>
             </div>
             <div class="card-body">
                 <div class="algorithm-theory">
                     <h5><i class="fas fa-info-circle me-2"></i>哈希函数原理</h5>
-                    <p>哈希函数将任意长度的数据映射为固定长度的散列值。理想的哈希函数具有以下特性：</p>
+                    <p>哈希函数是将任意长度的数据映射为固定长度输出的函数。主要特点：</p>
                     <ul>
-                        <li><strong>单向性</strong>：从散列值计算原始数据在计算上是不可行的</li>
-                        <li><strong>确定性</strong>：相同的输入总是产生相同的散列值</li>
-                        <li><strong>雪崩效应</strong>：输入的微小变化会导致散列值的显著变化</li>
-                        <li><strong>抗碰撞性</strong>：找到产生相同散列值的两个不同输入在计算上是困难的</li>
+                        <li><strong>单向性</strong>：从哈希值几乎不可能逆向推导出原始数据</li>
+                        <li><strong>确定性</strong>：相同的输入总是产生相同的输出</li>
+                        <li><strong>抗碰撞性</strong>：找到产生相同哈希值的两个不同输入非常困难</li>
+                        <li><strong>雪崩效应</strong>：输入的微小变化导致输出的显著变化</li>
                     </ul>
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-8">
-                        <form id="hashForm">
-                            <div class="mb-3">
-                                <label for="hashMessage" class="form-label">输入消息</label>
-                                <textarea class="form-control" id="hashMessage" rows="3" placeholder="输入要计算哈希值的消息"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="hashAlgorithm" class="form-label">选择哈希算法</label>
-                                <select class="form-select" id="hashAlgorithm">
-                                    <option value="sha1">SHA1 (160位)</option>
-                                    <option value="sha256" selected>SHA256 (256位)</option>
-                                    <option value="sha3_256">SHA3-256 (256位)</option>
-                                    <option value="sha3_512">SHA3-512 (512位)</option>
-                                    <option value="ripemd160">RIPEMD160 (160位)</option>
-                                </select>
-                            </div>
-                            <button type="button" id="calculateHashBtn" class="btn btn-success">
-                                <i class="fas fa-hashtag me-1"></i> 计算哈希值
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="hashResult" style="display:none;"></div>
+                <form id="hashForm">
+                    <div class="mb-3">
+                        <label for="hashMessage" class="form-label">消息</label>
+                        <textarea class="form-control" id="hashMessage" rows="4" placeholder="输入要计算哈希的消息"></textarea>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">哈希算法比较</div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <strong>SHA1</strong>: 160位，现已不推荐用于安全场景
-                                    </li>
-                                    <li class="list-group-item">
-                                        <strong>SHA256</strong>: 256位，目前最广泛使用的哈希算法
-                                    </li>
-                                    <li class="list-group-item">
-                                        <strong>SHA3</strong>: 新一代哈希算法，安全性更高
-                                    </li>
-                                    <li class="list-group-item">
-                                        <strong>RIPEMD160</strong>: 160位，常用于区块链等应用
-                                    </li>
-                                </ul>
+                    <div class="mb-3">
+                        <label class="form-label">哈希算法</label>
+                        <div class="d-flex flex-wrap">
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" name="hashAlgorithm" id="sha1" value="sha1" checked>
+                                <label class="form-check-label" for="sha1">SHA1</label>
+                            </div>
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" name="hashAlgorithm" id="sha256" value="sha256">
+                                <label class="form-check-label" for="sha256">SHA256</label>
+                            </div>
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" name="hashAlgorithm" id="sha3-256" value="sha3-256">
+                                <label class="form-check-label" for="sha3-256">SHA3-256</label>
+                            </div>
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" name="hashAlgorithm" id="sha3-512" value="sha3-512">
+                                <label class="form-check-label" for="sha3-512">SHA3-512</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="hashAlgorithm" id="ripemd160" value="ripemd160">
+                                <label class="form-check-label" for="ripemd160">RIPEMD160</label>
                             </div>
                         </div>
                     </div>
+                    <button type="button" id="calculateHashBtn" class="btn btn-primary">
+                        <i class="fas fa-calculator me-1"></i> 计算哈希
+                    </button>
+                </form>
+                <div class="result-area mt-3" id="hashResult" style="display:none;"></div>
+                
+                <hr class="my-4">
+                
+                <h5 class="mb-3">算法比较</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>算法</th>
+                                <th>输出长度</th>
+                                <th>安全性</th>
+                                <th>主要用途</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SHA1</td>
+                                <td>160位 (20字节)</td>
+                                <td>已被证明不够安全，存在碰撞攻击</td>
+                                <td>历史遗留系统，不推荐用于新系统</td>
+                            </tr>
+                            <tr>
+                                <td>SHA256</td>
+                                <td>256位 (32字节)</td>
+                                <td>强抗碰撞性，被广泛使用</td>
+                                <td>数字签名、证书、区块链</td>
+                            </tr>
+                            <tr>
+                                <td>SHA3-256</td>
+                                <td>256位 (32字节)</td>
+                                <td>更强的安全性，抵抗量子计算</td>
+                                <td>高安全性要求的应用</td>
+                            </tr>
+                            <tr>
+                                <td>SHA3-512</td>
+                                <td>512位 (64字节)</td>
+                                <td>最高级别安全性</td>
+                                <td>关键系统和长期数据保护</td>
+                            </tr>
+                            <tr>
+                                <td>RIPEMD160</td>
+                                <td>160位 (20字节)</td>
+                                <td>良好，但已不是最强</td>
+                                <td>比特币地址生成</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -102,69 +139,78 @@
     <!-- HMAC标签页 -->
     <div class="tab-pane fade" id="hmac" role="tabpanel" aria-labelledby="hmac-tab">
         <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-signature me-2"></i>HMAC (哈希消息认证码)</h5>
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-signature me-2"></i>HMAC (消息认证码)</h5>
             </div>
             <div class="card-body">
                 <div class="algorithm-theory">
                     <h5><i class="fas fa-info-circle me-2"></i>HMAC原理</h5>
-                    <p>HMAC (Hash-based Message Authentication Code) 是一种基于哈希函数的消息认证码，同时兼顾了消息完整性和身份认证功能。</p>
-                    <p>HMAC = Hash((Key ⊕ opad) || Hash((Key ⊕ ipad) || Message))</p>
+                    <p>HMAC (Hash-based Message Authentication Code) 是结合哈希函数和密钥的消息认证技术，可以：</p>
                     <ul>
-                        <li><strong>密钥</strong>：用于计算HMAC的密钥</li>
-                        <li><strong>消息</strong>：待验证的数据</li>
-                        <li><strong>opad, ipad</strong>：两个不同常量，用于增强安全性</li>
+                        <li><strong>验证完整性</strong>：确保消息未被篡改</li>
+                        <li><strong>身份认证</strong>：证明消息来自预期的发送者</li>
+                        <li><strong>加入密钥</strong>：基于哈希算法，但通过引入密钥增强安全性</li>
                     </ul>
                 </div>
                 
-                <div class="row">
-                    <div class="col-md-8">
-                        <form id="hmacForm">
-                            <div class="mb-3">
-                                <label for="hmacMessage" class="form-label">输入消息</label>
-                                <textarea class="form-control" id="hmacMessage" rows="3" placeholder="输入要计算HMAC的消息"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="hmacKey" class="form-label">密钥</label>
-                                <input type="text" class="form-control" id="hmacKey" placeholder="输入HMAC密钥">
-                                <div class="form-text">
-                                    <button type="button" id="generateHmacKey" class="btn btn-sm btn-outline-secondary mt-1">
-                                        生成随机密钥
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="hmacAlgorithm" class="form-label">选择哈希算法</label>
-                                <select class="form-select" id="hmacAlgorithm">
-                                    <option value="hmac_sha1">HMAC-SHA1</option>
-                                    <option value="hmac_sha256" selected>HMAC-SHA256</option>
-                                </select>
-                            </div>
-                            <button type="button" id="calculateHmacBtn" class="btn btn-primary">
-                                <i class="fas fa-signature me-1"></i> 计算HMAC
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="hmacResult" style="display:none;"></div>
+                <form id="hmacForm">
+                    <div class="mb-3">
+                        <label for="hmacMessage" class="form-label">消息</label>
+                        <textarea class="form-control" id="hmacMessage" rows="3" placeholder="输入要计算HMAC的消息"></textarea>
                     </div>
-                    
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-header">HMAC应用场景</div>
+                    <div class="mb-3">
+                        <label for="hmacKey" class="form-label">密钥</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="hmacKey" placeholder="输入密钥">
+                            <button class="btn btn-outline-secondary" type="button" id="generateHmacKeyBtn">
+                                <i class="fas fa-random"></i> 生成随机密钥
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">HMAC算法</label>
+                        <div class="d-flex">
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" name="hmacAlgorithm" id="hmacSha1" value="hmac-sha1" checked>
+                                <label class="form-check-label" for="hmacSha1">HMAC-SHA1</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="hmacAlgorithm" id="hmacSha256" value="hmac-sha256">
+                                <label class="form-check-label" for="hmacSha256">HMAC-SHA256</label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" id="calculateHmacBtn" class="btn btn-success">
+                        <i class="fas fa-signature me-1"></i> 计算HMAC
+                    </button>
+                </form>
+                <div class="result-area mt-3" id="hmacResult" style="display:none;"></div>
+                
+                <hr class="my-4">
+                
+                <h5>HMAC应用场景</h5>
+                <div class="row mt-3">
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">API认证</div>
                             <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check-circle text-success me-2"></i>消息完整性验证
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check-circle text-success me-2"></i>API身份认证
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check-circle text-success me-2"></i>会话令牌验证
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check-circle text-success me-2"></i>数字签名生成前处理
-                                    </li>
-                                </ul>
+                                <p>用于验证API请求的完整性和来源，防止请求被篡改或伪造。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">会话令牌</div>
+                            <div class="card-body">
+                                <p>生成防篡改的会话令牌，确保用户数据不被修改。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100">
+                            <div class="card-header bg-success text-white">密码存储</div>
+                            <div class="card-body">
+                                <p>作为PBKDF2等密钥派生函数的基础，用于安全存储密码。</p>
                             </div>
                         </div>
                     </div>
@@ -177,119 +223,136 @@
     <div class="tab-pane fade" id="pbkdf2" role="tabpanel" aria-labelledby="pbkdf2-tab">
         <div class="card mb-4">
             <div class="card-header bg-danger text-white">
-                <h5 class="mb-0"><i class="fas fa-key me-2"></i>PBKDF2 (密钥派生函数)</h5>
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i>PBKDF2 (密钥派生)</h5>
             </div>
             <div class="card-body">
                 <div class="algorithm-theory">
                     <h5><i class="fas fa-info-circle me-2"></i>PBKDF2原理</h5>
-                    <p>PBKDF2 (Password-Based Key Derivation Function 2) 是一种用于从密码中派生密钥的函数，它使用以下参数：</p>
+                    <p>PBKDF2 (Password-Based Key Derivation Function 2) 是一种密钥派生函数，专为密码哈希设计，主要特点：</p>
                     <ul>
-                        <li><strong>密码</strong>：原始密码或口令</li>
-                        <li><strong>盐值</strong>：随机生成的值，用于防止预计算攻击</li>
-                        <li><strong>迭代次数</strong>：重复哈希计算的次数，增加计算时间以抵抗暴力攻击</li>
-                        <li><strong>密钥长度</strong>：派生密钥的长度（字节）</li>
-                        <li><strong>哈希函数</strong>：用于哈希计算的伪随机函数</li>
+                        <li><strong>盐值</strong>：加入随机盐值，防止彩虹表攻击</li>
+                        <li><strong>可配置迭代次数</strong>：通过增加迭代次数增加暴力破解难度</li>
+                        <li><strong>灵活输出长度</strong>：可根据需要生成指定长度的密钥</li>
+                        <li><strong>使用HMAC</strong>：内部使用HMAC函数增强安全性</li>
                     </ul>
                 </div>
                 
-                <div class="row mb-4">
-                    <div class="col-md-6">
-                        <h5>生成盐值</h5>
-                        <form id="saltForm">
-                            <div class="mb-3">
-                                <label for="saltLength" class="form-label">盐值长度（字节）</label>
-                                <select class="form-select" id="saltLength">
-                                    <option value="16" selected>16</option>
-                                    <option value="24">24</option>
-                                    <option value="32">32</option>
-                                </select>
-                            </div>
-                            <button type="button" id="generateSaltBtn" class="btn btn-secondary">
-                                <i class="fas fa-random me-1"></i> 生成盐值
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="saltResult" style="display:none;"></div>
-                    </div>
-                </div>
+                <ul class="nav nav-tabs mb-3" id="pbkdf2SubTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pbkdf2-generate-tab" data-bs-toggle="tab" data-bs-target="#pbkdf2-generate" type="button" role="tab" aria-controls="pbkdf2-generate" aria-selected="true">密钥派生</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pbkdf2-verify-tab" data-bs-toggle="tab" data-bs-target="#pbkdf2-verify" type="button" role="tab" aria-controls="pbkdf2-verify" aria-selected="false">密钥验证</button>
+                    </li>
+                </ul>
                 
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>密钥派生</h5>
-                        <form id="pbkdf2Form">
+                <div class="tab-content" id="pbkdf2SubTabsContent">
+                    <!-- 密钥派生子标签页 -->
+                    <div class="tab-pane fade show active" id="pbkdf2-generate" role="tabpanel" aria-labelledby="pbkdf2-generate-tab">
+                        <form id="pbkdf2GenerateForm">
                             <div class="mb-3">
                                 <label for="pbkdf2Password" class="form-label">密码</label>
-                                <input type="password" class="form-control" id="pbkdf2Password" placeholder="输入密码">
+                                <input type="text" class="form-control" id="pbkdf2Password" placeholder="输入要派生密钥的密码">
                             </div>
                             <div class="mb-3">
-                                <label for="pbkdf2Salt" class="form-label">盐值（十六进制）</label>
-                                <input type="text" class="form-control" id="pbkdf2Salt" placeholder="输入十六进制盐值">
+                                <label for="pbkdf2Salt" class="form-label">盐值 (可选，留空将随机生成)</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="pbkdf2Salt" placeholder="Base64编码的盐值">
+                                    <button class="btn btn-outline-secondary" type="button" id="generateSaltBtn">
+                                        <i class="fas fa-random"></i> 生成随机盐值
+                                    </button>
+                                </div>
+                                <div class="form-text">盐值用于防止彩虹表攻击，应该为每个密码使用不同的盐值。</div>
                             </div>
-                            <div class="mb-3">
-                                <label for="pbkdf2Iterations" class="form-label">迭代次数</label>
-                                <select class="form-select" id="pbkdf2Iterations">
-                                    <option value="1000">1,000</option>
-                                    <option value="5000">5,000</option>
-                                    <option value="10000" selected>10,000</option>
-                                    <option value="25000">25,000</option>
-                                    <option value="50000">50,000</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label for="pbkdf2DkLen" class="form-label">密钥长度（字节）</label>
-                                <select class="form-select" id="pbkdf2DkLen">
-                                    <option value="16">16 (128 bits)</option>
-                                    <option value="24">24 (192 bits)</option>
-                                    <option value="32" selected>32 (256 bits)</option>
-                                    <option value="64">64 (512 bits)</option>
-                                </select>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="pbkdf2Iterations" class="form-label">迭代次数</label>
+                                    <input type="number" class="form-control" id="pbkdf2Iterations" value="10000" min="1000">
+                                    <div class="form-text">更高的迭代次数提供更强的安全性，但需要更多计算资源。</div>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="pbkdf2KeyLength" class="form-label">密钥长度 (字节)</label>
+                                    <input type="number" class="form-control" id="pbkdf2KeyLength" value="32" min="16" max="64">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">哈希函数</label>
+                                    <div class="d-flex">
+                                        <div class="form-check me-4">
+                                            <input class="form-check-input" type="radio" name="pbkdf2HashFunction" id="pbkdf2Sha1" value="sha1">
+                                            <label class="form-check-label" for="pbkdf2Sha1">SHA1</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="pbkdf2HashFunction" id="pbkdf2Sha256" value="sha256" checked>
+                                            <label class="form-check-label" for="pbkdf2Sha256">SHA256</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                             <button type="button" id="derivePbkdf2KeyBtn" class="btn btn-danger">
                                 <i class="fas fa-key me-1"></i> 派生密钥
                             </button>
                         </form>
-                        <div class="result-area mt-3" id="pbkdf2Result" style="display:none;"></div>
+                        <div class="result-area mt-3" id="pbkdf2GenerateResult" style="display:none;"></div>
                     </div>
                     
-                    <div class="col-md-6">
-                        <h5>密钥验证</h5>
+                    <!-- 密钥验证子标签页 -->
+                    <div class="tab-pane fade" id="pbkdf2-verify" role="tabpanel" aria-labelledby="pbkdf2-verify-tab">
                         <form id="pbkdf2VerifyForm">
                             <div class="mb-3">
                                 <label for="pbkdf2VerifyPassword" class="form-label">密码</label>
-                                <input type="password" class="form-control" id="pbkdf2VerifyPassword" placeholder="输入密码">
+                                <input type="text" class="form-control" id="pbkdf2VerifyPassword" placeholder="输入要验证的密码">
                             </div>
                             <div class="mb-3">
-                                <label for="pbkdf2VerifyDerivedKey" class="form-label">派生密钥（十六进制）</label>
-                                <input type="text" class="form-control" id="pbkdf2VerifyDerivedKey" placeholder="输入十六进制派生密钥">
+                                <label for="pbkdf2VerifyDerivedKey" class="form-label">派生密钥</label>
+                                <input type="text" class="form-control" id="pbkdf2VerifyDerivedKey" placeholder="Base64编码的派生密钥">
                             </div>
                             <div class="mb-3">
-                                <label for="pbkdf2VerifySalt" class="form-label">盐值（十六进制）</label>
-                                <input type="text" class="form-control" id="pbkdf2VerifySalt" placeholder="输入十六进制盐值">
+                                <label for="pbkdf2VerifySalt" class="form-label">盐值</label>
+                                <input type="text" class="form-control" id="pbkdf2VerifySalt" placeholder="Base64编码的盐值">
                             </div>
-                            <div class="mb-3">
-                                <label for="pbkdf2VerifyIterations" class="form-label">迭代次数</label>
-                                <select class="form-select" id="pbkdf2VerifyIterations">
-                                    <option value="1000">1,000</option>
-                                    <option value="5000">5,000</option>
-                                    <option value="10000" selected>10,000</option>
-                                    <option value="25000">25,000</option>
-                                    <option value="50000">50,000</option>
-                                </select>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="pbkdf2VerifyIterations" class="form-label">迭代次数</label>
+                                    <input type="number" class="form-control" id="pbkdf2VerifyIterations" value="10000" min="1000">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="pbkdf2VerifyKeyLength" class="form-label">密钥长度 (字节)</label>
+                                    <input type="number" class="form-control" id="pbkdf2VerifyKeyLength" value="32" min="16" max="64">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">哈希函数</label>
+                                    <div class="d-flex">
+                                        <div class="form-check me-4">
+                                            <input class="form-check-input" type="radio" name="pbkdf2VerifyHashFunction" id="pbkdf2VerifySha1" value="sha1">
+                                            <label class="form-check-label" for="pbkdf2VerifySha1">SHA1</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="pbkdf2VerifyHashFunction" id="pbkdf2VerifySha256" value="sha256" checked>
+                                            <label class="form-check-label" for="pbkdf2VerifySha256">SHA256</label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="pbkdf2VerifyDkLen" class="form-label">密钥长度（字节）</label>
-                                <select class="form-select" id="pbkdf2VerifyDkLen">
-                                    <option value="16">16 (128 bits)</option>
-                                    <option value="24">24 (192 bits)</option>
-                                    <option value="32" selected>32 (256 bits)</option>
-                                    <option value="64">64 (512 bits)</option>
-                                </select>
-                            </div>
-                            <button type="button" id="verifyPbkdf2KeyBtn" class="btn btn-outline-danger">
+                            <button type="button" id="verifyPbkdf2KeyBtn" class="btn btn-primary">
                                 <i class="fas fa-check-circle me-1"></i> 验证密钥
                             </button>
                         </form>
                         <div class="result-area mt-3" id="pbkdf2VerifyResult" style="display:none;"></div>
                     </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h5>密码安全最佳实践</h5>
+                <div class="alert alert-info">
+                    <h6><i class="fas fa-shield-alt me-2"></i>安全使用PBKDF2的建议</h6>
+                    <ul class="mb-0">
+                        <li>使用足够长的随机盐值（至少16字节）</li>
+                        <li>迭代次数应根据安全需求和性能平衡确定（推荐10,000次以上）</li>
+                        <li>盐值应与派生密钥一起存储</li>
+                        <li>偏好使用SHA256而非SHA1作为哈希函数</li>
+                        <li>对于高安全性要求，可以考虑使用Argon2等更现代的密钥派生函数</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -303,7 +366,7 @@ $(document).ready(function() {
     // 基本哈希函数
     $('#calculateHashBtn').click(function() {
         const message = $('#hashMessage').val();
-        const algorithm = $('#hashAlgorithm').val();
+        const algorithm = $('input[name="hashAlgorithm"]:checked').val();
         const button = this;
         const originalText = $(button).html();
         
@@ -314,29 +377,8 @@ $(document).ready(function() {
         
         showLoading(button);
         
-        let endpoint = '';
-        switch (algorithm) {
-            case 'sha1':
-                endpoint = '/api/hash/sha1';
-                break;
-            case 'sha256':
-                endpoint = '/api/hash/sha256';
-                break;
-            case 'sha3_256':
-                endpoint = '/api/hash/sha3-256';
-                break;
-            case 'sha3_512':
-                endpoint = '/api/hash/sha3-512';
-                break;
-            case 'ripemd160':
-                endpoint = '/api/hash/ripemd160';
-                break;
-            default:
-                endpoint = '/api/hash/sha256';
-        }
-        
         $.ajax({
-            url: endpoint,
+            url: `/api/hash/${algorithm}`,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ message: message }),
@@ -356,7 +398,7 @@ $(document).ready(function() {
     });
     
     // 生成随机HMAC密钥
-    $('#generateHmacKey').click(function() {
+    $('#generateHmacKeyBtn').click(function() {
         const randomKey = generateRandomString(16);
         $('#hmacKey').val(randomKey);
     });
@@ -365,31 +407,24 @@ $(document).ready(function() {
     $('#calculateHmacBtn').click(function() {
         const message = $('#hmacMessage').val();
         const key = $('#hmacKey').val();
-        const algorithm = $('#hmacAlgorithm').val();
+        const algorithm = $('input[name="hmacAlgorithm"]:checked').val();
         const button = this;
         const originalText = $(button).html();
         
-        if (!message || !key) {
-            showResult('#hmacResult', '消息和密钥不能为空', false);
+        if (!message) {
+            showResult('#hmacResult', '消息不能为空', false);
+            return;
+        }
+        
+        if (!key) {
+            showResult('#hmacResult', '密钥不能为空', false);
             return;
         }
         
         showLoading(button);
         
-        let endpoint = '';
-        switch (algorithm) {
-            case 'hmac_sha1':
-                endpoint = '/api/hash/hmac-sha1';
-                break;
-            case 'hmac_sha256':
-                endpoint = '/api/hash/hmac-sha256';
-                break;
-            default:
-                endpoint = '/api/hash/hmac-sha256';
-        }
-        
         $.ajax({
-            url: endpoint,
+            url: `/api/hash/${algorithm}`,
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ message: message, key: key }),
@@ -408,98 +443,97 @@ $(document).ready(function() {
         });
     });
     
-    // 生成盐值
+    // 生成随机盐值
     $('#generateSaltBtn').click(function() {
-        const length = $('#saltLength').val();
-        const button = this;
-        const originalText = $(button).html();
-        
-        showLoading(button);
-        
-        $.ajax({
-            url: '/api/hash/generate-salt',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ length: parseInt(length) }),
-            success: function(response) {
-                if (response.success) {
-                    showResult('#saltResult', response.data.salt);
-                    
-                    // 自动填充表单
-                    $('#pbkdf2Salt').val(response.data.salt);
-                    $('#pbkdf2VerifySalt').val(response.data.salt);
-                } else {
-                    showResult('#saltResult', response.message, false);
-                }
-                hideLoading(button, originalText);
-            },
-            error: function(xhr, status, error) {
-                showResult('#saltResult', handleAjaxError(xhr, status, error), false);
-                hideLoading(button, originalText);
-            }
-        });
+        // 生成16字节的随机数据，转为Base64
+        const array = new Uint8Array(16);
+        window.crypto.getRandomValues(array);
+        const salt = btoa(String.fromCharCode.apply(null, array));
+        $('#pbkdf2Salt').val(salt);
     });
     
-    // PBKDF2派生密钥
+    // PBKDF2密钥派生
     $('#derivePbkdf2KeyBtn').click(function() {
         const password = $('#pbkdf2Password').val();
         const salt = $('#pbkdf2Salt').val();
         const iterations = $('#pbkdf2Iterations').val();
-        const dklen = $('#pbkdf2DkLen').val();
+        const keyLength = $('#pbkdf2KeyLength').val();
+        const hashFunction = $('input[name="pbkdf2HashFunction"]:checked').val();
         const button = this;
         const originalText = $(button).html();
         
-        if (!password || !salt) {
-            showResult('#pbkdf2Result', '密码和盐值不能为空', false);
+        if (!password) {
+            showResult('#pbkdf2GenerateResult', '密码不能为空', false);
             return;
         }
         
         showLoading(button);
         
+        const data = {
+            password: password,
+            iterations: parseInt(iterations),
+            key_length: parseInt(keyLength),
+            hash_function: hashFunction
+        };
+        
+        if (salt) {
+            data.salt = salt;
+        }
+        
         $.ajax({
             url: '/api/hash/pbkdf2',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ 
-                password: password,
-                salt: salt,
-                iterations: parseInt(iterations),
-                dklen: parseInt(dklen)
-            }),
+            data: JSON.stringify(data),
             success: function(response) {
                 if (response.success) {
-                    showResult('#pbkdf2Result', response.data.derived_key);
+                    const result = `
+<h6>派生密钥：</h6>
+<div class="mb-2">${response.data.derived_key}</div>
+<h6>参数：</h6>
+<ul>
+    <li>盐值：${response.data.salt}</li>
+    <li>迭代次数：${response.data.iterations}</li>
+    <li>密钥长度：${response.data.key_length} 字节</li>
+    <li>哈希函数：${response.data.hash_function}</li>
+</ul>
+<div class="alert alert-warning mt-2">
+    <i class="fas fa-exclamation-triangle me-2"></i>请妥善保存上述所有信息，它们都需要用于密钥验证。
+</div>`;
+                    showResult('#pbkdf2GenerateResult', result);
                     
                     // 自动填充验证表单
                     $('#pbkdf2VerifyPassword').val(password);
                     $('#pbkdf2VerifyDerivedKey').val(response.data.derived_key);
-                    $('#pbkdf2VerifySalt').val(salt);
-                    $('#pbkdf2VerifyIterations').val(iterations);
-                    $('#pbkdf2VerifyDkLen').val(dklen);
+                    $('#pbkdf2VerifySalt').val(response.data.salt);
+                    $('#pbkdf2VerifyIterations').val(response.data.iterations);
+                    $('#pbkdf2VerifyKeyLength').val(response.data.key_length);
+                    $(`input[name="pbkdf2VerifyHashFunction"][value="${response.data.hash_function}"]`).prop('checked', true);
                 } else {
-                    showResult('#pbkdf2Result', response.message, false);
+                    showResult('#pbkdf2GenerateResult', response.message, false);
                 }
                 hideLoading(button, originalText);
             },
             error: function(xhr, status, error) {
-                showResult('#pbkdf2Result', handleAjaxError(xhr, status, error), false);
+                showResult('#pbkdf2GenerateResult', handleAjaxError(xhr, status, error), false);
                 hideLoading(button, originalText);
             }
         });
     });
     
-    // PBKDF2验证密钥
+    // PBKDF2密钥验证
     $('#verifyPbkdf2KeyBtn').click(function() {
         const password = $('#pbkdf2VerifyPassword').val();
         const derivedKey = $('#pbkdf2VerifyDerivedKey').val();
         const salt = $('#pbkdf2VerifySalt').val();
         const iterations = $('#pbkdf2VerifyIterations').val();
-        const dklen = $('#pbkdf2VerifyDkLen').val();
+        const keyLength = $('#pbkdf2VerifyKeyLength').val();
+        const hashFunction = $('input[name="pbkdf2VerifyHashFunction"]:checked').val();
         const button = this;
         const originalText = $(button).html();
         
         if (!password || !derivedKey || !salt) {
-            showResult('#pbkdf2VerifyResult', '密码、派生密钥和盐值不能为空', false);
+            showResult('#pbkdf2VerifyResult', '密码、派生密钥和盐值均不能为空', false);
             return;
         }
         
@@ -509,18 +543,21 @@ $(document).ready(function() {
             url: '/api/hash/pbkdf2-verify',
             method: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ 
+            data: JSON.stringify({
                 password: password,
                 derived_key: derivedKey,
                 salt: salt,
                 iterations: parseInt(iterations),
-                dklen: parseInt(dklen)
+                key_length: parseInt(keyLength),
+                hash_function: hashFunction
             }),
             success: function(response) {
                 if (response.success) {
-                    const verified = response.data.verified;
-                    const resultText = verified ? '验证成功：密钥匹配' : '验证失败：密钥不匹配';
-                    showResult('#pbkdf2VerifyResult', resultText, verified);
+                    if (response.data.verified) {
+                        showResult('#pbkdf2VerifyResult', '<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i>密码验证成功！密码与派生密钥匹配。</div>');
+                    } else {
+                        showResult('#pbkdf2VerifyResult', '<div class="alert alert-danger"><i class="fas fa-times-circle me-2"></i>密码验证失败！密码与派生密钥不匹配。</div>');
+                    }
                 } else {
                     showResult('#pbkdf2VerifyResult', response.message, false);
                 }

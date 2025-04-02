@@ -6,7 +6,7 @@ import logging
 import json
 import traceback
 from app.crypto.symmetric import AES, SM4, RC6
-from app.crypto.hash import HashFunctions, HMACFunctions, KeyDerivation
+from app.crypto.hash import HashFunctions, HMACFunctions, KeyDerivation, HashAlgorithms
 from app.crypto.encoding import Encoding
 from app.crypto.asymmetric import RSAEncryption, ECCEncryption
 
@@ -255,7 +255,7 @@ def hash_sha1():
         return api_response(False, None, "消息不能为空", 400)
     
     # 执行哈希
-    hash_value = HashFunctions.sha1(message)
+    hash_value = HashAlgorithms.sha1(message)
     logger.info("执行SHA1哈希")
     
     return api_response(True, {"hash": hash_value}, "SHA1哈希计算成功")
@@ -273,7 +273,7 @@ def hash_sha256():
         return api_response(False, None, "消息不能为空", 400)
     
     # 执行哈希
-    hash_value = HashFunctions.sha256(message)
+    hash_value = HashAlgorithms.sha256(message)
     logger.info("执行SHA256哈希")
     
     return api_response(True, {"hash": hash_value}, "SHA256哈希计算成功")
@@ -291,7 +291,7 @@ def hash_sha3_256():
         return api_response(False, None, "消息不能为空", 400)
     
     # 执行哈希
-    hash_value = HashFunctions.sha3_256(message)
+    hash_value = HashAlgorithms.sha3_256(message)
     logger.info("执行SHA3-256哈希")
     
     return api_response(True, {"hash": hash_value}, "SHA3-256哈希计算成功")
@@ -309,7 +309,7 @@ def hash_sha3_512():
         return api_response(False, None, "消息不能为空", 400)
     
     # 执行哈希
-    hash_value = HashFunctions.sha3_512(message)
+    hash_value = HashAlgorithms.sha3_512(message)
     logger.info("执行SHA3-512哈希")
     
     return api_response(True, {"hash": hash_value}, "SHA3-512哈希计算成功")
@@ -327,7 +327,7 @@ def hash_ripemd160():
         return api_response(False, None, "消息不能为空", 400)
     
     # 执行哈希
-    hash_value = HashFunctions.ripemd160(message)
+    hash_value = HashAlgorithms.ripemd160(message)
     logger.info("执行RIPEMD160哈希")
     
     return api_response(True, {"hash": hash_value}, "RIPEMD160哈希计算成功")
@@ -346,7 +346,7 @@ def hmac_sha1():
         return api_response(False, None, "消息和密钥不能为空", 400)
     
     # 执行HMAC
-    hmac_value = HMACFunctions.hmac_sha1(key, message)
+    hmac_value = HashAlgorithms.hmac_sha1(key, message)
     logger.info("执行HMAC-SHA1")
     
     return api_response(True, {"hmac": hmac_value}, "HMAC-SHA1计算成功")
@@ -365,7 +365,7 @@ def hmac_sha256():
         return api_response(False, None, "消息和密钥不能为空", 400)
     
     # 执行HMAC
-    hmac_value = HMACFunctions.hmac_sha256(key, message)
+    hmac_value = HashAlgorithms.hmac_sha256(key, message)
     logger.info("执行HMAC-SHA256")
     
     return api_response(True, {"hmac": hmac_value}, "HMAC-SHA256计算成功")

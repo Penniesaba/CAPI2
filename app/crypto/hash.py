@@ -6,11 +6,218 @@ import binascii
 import os
 import hashlib
 import hmac
-from Crypto.Hash import SHA1, SHA256, SHA3_256, SHA3_512, RIPEMD160
+from Crypto.Hash import SHA1, SHA256, SHA3_256, SHA3_512, RIPEMD160, HMAC
 from Crypto.Protocol.KDF import PBKDF2
+from Crypto.Random import get_random_bytes
+import base64
 
 # 获取模块级别的日志记录器
 logger = logging.getLogger(__name__)
+
+class HashAlgorithms:
+    """
+    哈希算法实现类
+    包含SHA1, SHA256, SHA3-256, SHA3-512, RIPEMD160, HMAC和PBKDF2算法
+    """
+    
+    @staticmethod
+    def sha1(message):
+        """
+        计算SHA1哈希值
+        
+        Args:
+            message (str): 需要计算哈希的消息
+            
+        Returns:
+            str: 十六进制格式的哈希值
+        """
+        hash_obj = SHA1.new()
+        hash_obj.update(message.encode('utf-8'))
+        return hash_obj.hexdigest()
+    
+    @staticmethod
+    def sha256(message):
+        """
+        计算SHA256哈希值
+        
+        Args:
+            message (str): 需要计算哈希的消息
+            
+        Returns:
+            str: 十六进制格式的哈希值
+        """
+        hash_obj = SHA256.new()
+        hash_obj.update(message.encode('utf-8'))
+        return hash_obj.hexdigest()
+    
+    @staticmethod
+    def sha3_256(message):
+        """
+        计算SHA3-256哈希值
+        
+        Args:
+            message (str): 需要计算哈希的消息
+            
+        Returns:
+            str: 十六进制格式的哈希值
+        """
+        hash_obj = SHA3_256.new()
+        hash_obj.update(message.encode('utf-8'))
+        return hash_obj.hexdigest()
+    
+    @staticmethod
+    def sha3_512(message):
+        """
+        计算SHA3-512哈希值
+        
+        Args:
+            message (str): 需要计算哈希的消息
+            
+        Returns:
+            str: 十六进制格式的哈希值
+        """
+        hash_obj = SHA3_512.new()
+        hash_obj.update(message.encode('utf-8'))
+        return hash_obj.hexdigest()
+    
+    @staticmethod
+    def ripemd160(message):
+        """
+        计算RIPEMD160哈希值
+        
+        Args:
+            message (str): 需要计算哈希的消息
+            
+        Returns:
+            str: 十六进制格式的哈希值
+        """
+        hash_obj = RIPEMD160.new()
+        hash_obj.update(message.encode('utf-8'))
+        return hash_obj.hexdigest()
+    
+    @staticmethod
+    def hmac_sha1(message, key):
+        """
+        计算HMAC-SHA1值
+        
+        Args:
+            message (str): 需要计算HMAC的消息
+            key (str): 密钥
+            
+        Returns:
+            str: 十六进制格式的HMAC值
+        """
+        hmac_obj = HMAC.new(key.encode('utf-8'), digestmod=SHA1)
+        hmac_obj.update(message.encode('utf-8'))
+        return hmac_obj.hexdigest()
+    
+    @staticmethod
+    def hmac_sha256(message, key):
+        """
+        计算HMAC-SHA256值
+        
+        Args:
+            message (str): 需要计算HMAC的消息
+            key (str): 密钥
+            
+        Returns:
+            str: 十六进制格式的HMAC值
+        """
+        hmac_obj = HMAC.new(key.encode('utf-8'), digestmod=SHA256)
+        hmac_obj.update(message.encode('utf-8'))
+        return hmac_obj.hexdigest()
+    
+    @staticmethod
+    def pbkdf2(password, salt=None, iterations=10000, key_length=32, hash_function='sha256'):
+        """
+        使用PBKDF2算法派生密钥
+        
+        Args:
+            password (str): 原始密码
+            salt (bytes, optional): 盐值，如果不提供则随机生成
+            iterations (int, optional): 迭代次数，默认10000
+            key_length (int, optional): 生成的密钥长度（字节），默认32
+            hash_function (str, optional): 使用的哈希函数，可选值: "sha1", "sha256"，默认"sha256"
+            
+        Returns:
+            dict: 包含以下键的字典：
+                - derived_key: Base64编码的派生密钥
+                - salt: Base64编码的盐值
+                - iterations: 迭代次数
+                - key_length: 密钥长度
+                - hash_function: 使用的哈希函数
+        """
+        if salt is None:
+            salt = get_random_bytes(16)
+        elif isinstance(salt, str):
+            # 如果盐值是Base64编码的字符串，则解码
+            try:
+                salt = base64.b64decode(salt)
+            except:
+                # 如果解码失败，则将字符串直接编码为字节
+                salt = salt.encode('utf-8')
+        
+        # 选择哈希函数
+        if hash_function.lower() == 'sha1':
+            hash_module = SHA1
+        else:  # 默认使用SHA256
+            hash_module = SHA256
+            hash_function = 'sha256'
+        
+        # 派生密钥
+        derived_key = PBKDF2(
+            password=password.encode('utf-8'),
+            salt=salt,
+            dkLen=key_length,
+            count=iterations,
+            hmac_hash_module=hash_module
+        )
+        
+        # 返回结果
+        return {
+            'derived_key': base64.b64encode(derived_key).decode('utf-8'),
+            'salt': base64.b64encode(salt).decode('utf-8'),
+            'iterations': iterations,
+            'key_length': key_length,
+            'hash_function': hash_function
+        }
+    
+    @staticmethod
+    def pbkdf2_verify(password, derived_key, salt, iterations=10000, key_length=32, hash_function='sha256'):
+        """
+        验证密码是否匹配PBKDF2派生的密钥
+        
+        Args:
+            password (str): 要验证的密码
+            derived_key (str): Base64编码的已派生密钥
+            salt (str): Base64编码的盐值
+            iterations (int, optional): 迭代次数，默认10000
+            key_length (int, optional): 密钥长度（字节），默认32
+            hash_function (str, optional): 使用的哈希函数，可选值: "sha1", "sha256"，默认"sha256"
+            
+        Returns:
+            bool: 密码是否匹配
+        """
+        # 解码盐值和已派生密钥
+        try:
+            salt_bytes = base64.b64decode(salt)
+            expected_key = base64.b64decode(derived_key)
+        except:
+            return False
+        
+        # 使用相同参数派生新密钥
+        result = HashAlgorithms.pbkdf2(
+            password=password,
+            salt=salt_bytes,
+            iterations=iterations,
+            key_length=key_length,
+            hash_function=hash_function
+        )
+        
+        # 比较新派生的密钥与预期密钥
+        new_key = base64.b64decode(result['derived_key'])
+        return new_key == expected_key
+
 
 class HashFunctions:
     """

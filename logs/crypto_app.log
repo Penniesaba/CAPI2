@@ -4,3 +4,17 @@
 2025-04-02 11:31:34,955 INFO: 密码算法应用启动 [in /home/xiao/project/CodeInsightX/app/__init__.py:40]
 2025-04-02 11:33:57,065 - app - INFO - 密码算法应用启动
 2025-04-02 11:35:47,018 - app - INFO - 密码算法应用启动
+2025-04-02 11:46:58,305 - app.crypto.symmetric - INFO - 已生成RC6密钥
+2025-04-02 11:46:58,305 - app.routes.api_routes - INFO - 生成RC6密钥
+2025-04-02 11:47:03,892 - app.crypto.symmetric - INFO - RC6加密成功
+2025-04-02 11:47:03,893 - app.routes.api_routes - INFO - 执行RC6加密
+2025-04-02 11:50:03,285 - app.crypto.symmetric - INFO - 已生成SM4密钥
+2025-04-02 11:50:03,286 - app.routes.api_routes - INFO - 生成SM4密钥
+2025-04-02 11:50:07,340 - app.crypto.symmetric - INFO - SM4-ECB加密成功
+2025-04-02 11:50:07,340 - app.routes.api_routes - INFO - 执行SM4-ECB加密
+2025-04-02 11:50:12,804 - app.crypto.symmetric - INFO - 已生成RC6密钥
+2025-04-02 11:50:12,804 - app.routes.api_routes - INFO - 生成RC6密钥
+2025-04-02 11:50:16,633 - app.crypto.symmetric - INFO - RC6加密成功
+2025-04-02 11:50:16,633 - app.routes.api_routes - INFO - 执行RC6加密
+2025-04-02 11:57:33,425 - app - INFO - 密码算法应用启动
+2025-04-02 11:58:03,096 - app - INFO - 密码算法应用启动
