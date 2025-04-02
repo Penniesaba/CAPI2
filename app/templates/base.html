@@ -232,11 +232,6 @@
                                     PBKDF2 (密钥派生)
                                 </a>
                             </li>
-                            <li class="sidebar-subitem">
-                                <a href="{{ url_for('web.hash_theory') }}" class="sidebar-sublink {% if 'hash_theory' in request.path %}active{% endif %}">
-                                    哈希算法原理
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </li>
@@ -256,16 +251,6 @@
                             <li class="sidebar-subitem">
                                 <a href="{{ url_for('web.encoding') }}#utf8" class="sidebar-sublink {% if 'encoding' in request.path and 'utf8' in request.args.get('tab', '') %}active{% endif %}">
                                     UTF-8编码
-                                </a>
-                            </li>
-                            <li class="sidebar-subitem">
-                                <a href="{{ url_for('web.encoding') }}#hex" class="sidebar-sublink {% if 'encoding' in request.path and 'hex' in request.args.get('tab', '') %}active{% endif %}">
-                                    十六进制编码
-                                </a>
-                            </li>
-                            <li class="sidebar-subitem">
-                                <a href="{{ url_for('web.encoding_theory') }}" class="sidebar-sublink {% if 'encoding_theory' in request.path %}active{% endif %}">
-                                    编码算法原理
                                 </a>
                             </li>
                         </ul>
@@ -292,11 +277,6 @@
                             <li class="sidebar-subitem">
                                 <a href="{{ url_for('web.asymmetric') }}#signature" class="sidebar-sublink {% if 'asymmetric' in request.path and 'signature' in request.args.get('tab', '') %}active{% endif %}">
                                     数字签名
-                                </a>
-                            </li>
-                            <li class="sidebar-subitem">
-                                <a href="{{ url_for('web.asymmetric_theory') }}" class="sidebar-sublink {% if 'asymmetric_theory' in request.path %}active{% endif %}">
-                                    非对称加密原理
                                 </a>
                             </li>
                         </ul>

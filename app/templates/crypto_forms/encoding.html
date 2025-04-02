@@ -34,58 +34,31 @@
     <!-- Base64编码标签页 -->
     <div class="tab-pane fade show active" id="base64" role="tabpanel" aria-labelledby="base64-tab">
         <div class="card mb-4">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0"><i class="fas fa-file-code me-2"></i>Base64 编码</h5>
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-file-code me-2"></i>Base64 编码/解码</h5>
             </div>
             <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>Base64编码原理</h5>
-                    <p>Base64是一种二进制到文本的编码方案，它将二进制数据转换为可打印的ASCII字符子集。主要特点：</p>
-                    <ul>
-                        <li><strong>基本字符集</strong>: A-Z, a-z, 0-9, +, / (共64个字符)</li>
-                        <li><strong>填充字符</strong>: = (用于补齐最后一组)</li>
-                        <li><strong>编码过程</strong>: 将3个字节(24位)分割为4个6位块，每个6位块映射到64个字符之一</li>
-                        <li><strong>URL安全Base64</strong>: 将+替换为-，/替换为_，以便在URL中安全使用</li>
-                    </ul>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>Base64编码</h5>
-                        <form id="base64EncodeForm">
-                            <div class="mb-3">
-                                <label for="base64EncodeText" class="form-label">原始文本</label>
-                                <textarea class="form-control" id="base64EncodeText" rows="4" placeholder="输入要编码的文本"></textarea>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="urlSafeEncode">
-                                <label class="form-check-label" for="urlSafeEncode">使用URL安全编码</label>
-                            </div>
-                            <button type="button" id="base64EncodeBtn" class="btn btn-warning">
-                                <i class="fas fa-arrow-down me-1"></i> 编码
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="base64EncodeResult" style="display:none;"></div>
+                <form id="base64Form">
+                    <div class="mb-3">
+                        <label for="base64Input" class="form-label">输入文本</label>
+                        <textarea class="form-control" id="base64Input" rows="4" placeholder="输入要编码或解码的文本"></textarea>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <h5>Base64解码</h5>
-                        <form id="base64DecodeForm">
-                            <div class="mb-3">
-                                <label for="base64DecodeText" class="form-label">Base64编码文本</label>
-                                <textarea class="form-control" id="base64DecodeText" rows="4" placeholder="输入要解码的Base64文本"></textarea>
-                            </div>
-                            <div class="mb-3 form-check">
-                                <input type="checkbox" class="form-check-input" id="urlSafeDecode">
-                                <label class="form-check-label" for="urlSafeDecode">使用URL安全解码</label>
-                            </div>
-                            <button type="button" id="base64DecodeBtn" class="btn btn-primary">
-                                <i class="fas fa-arrow-up me-1"></i> 解码
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="base64DecodeResult" style="display:none;"></div>
+                    <div class="mb-3">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="urlSafeCheckbox">
+                            <label class="form-check-label" for="urlSafeCheckbox">使用URL安全模式</label>
+                        </div>
                     </div>
-                </div>
+                    <div class="d-flex">
+                        <button type="button" id="encodeBase64Btn" class="btn btn-primary me-2">
+                            <i class="fas fa-arrow-down me-1"></i> 编码
+                        </button>
+                        <button type="button" id="decodeBase64Btn" class="btn btn-secondary">
+                            <i class="fas fa-arrow-up me-1"></i> 解码
+                        </button>
+                    </div>
+                </form>
+                <div class="result-area mt-3" id="base64Result" style="display:none;"></div>
             </div>
         </div>
     </div>
@@ -93,108 +66,25 @@
     <!-- UTF-8编码标签页 -->
     <div class="tab-pane fade" id="utf8" role="tabpanel" aria-labelledby="utf8-tab">
         <div class="card mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-font me-2"></i>UTF-8 编码</h5>
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-file-alt me-2"></i>UTF-8 编码/解码</h5>
             </div>
             <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>UTF-8编码原理</h5>
-                    <p>UTF-8是一种可变长度的Unicode字符编码，能够用1-4个字节表示不同的字符，主要特点：</p>
-                    <ul>
-                        <li><strong>ASCII兼容</strong>: ASCII字符(0-127)使用1个字节编码，与ASCII码相同</li>
-                        <li><strong>可变长度</strong>: 根据字符范围使用1-4个字节</li>
-                        <li><strong>自同步</strong>: 可以从任意位置确定字符边界</li>
-                        <li><strong>编码规则</strong>:
-                            <ul>
-                                <li>1字节: 0xxxxxxx (ASCII字符)</li>
-                                <li>2字节: 110xxxxx 10xxxxxx</li>
-                                <li>3字节: 1110xxxx 10xxxxxx 10xxxxxx</li>
-                                <li>4字节: 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx</li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>UTF-8编码</h5>
-                        <form id="utf8EncodeForm">
-                            <div class="mb-3">
-                                <label for="utf8EncodeText" class="form-label">原始文本</label>
-                                <textarea class="form-control" id="utf8EncodeText" rows="4" placeholder="输入要编码的文本"></textarea>
-                            </div>
-                            <button type="button" id="utf8EncodeBtn" class="btn btn-info">
-                                <i class="fas fa-arrow-down me-1"></i> 编码为十六进制
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="utf8EncodeResult" style="display:none;"></div>
+                <form id="utf8Form">
+                    <div class="mb-3">
+                        <label for="utf8Input" class="form-label">输入文本</label>
+                        <textarea class="form-control" id="utf8Input" rows="4" placeholder="输入要编码或解码的文本"></textarea>
                     </div>
-                    
-                    <div class="col-md-6">
-                        <h5>UTF-8解码</h5>
-                        <form id="utf8DecodeForm">
-                            <div class="mb-3">
-                                <label for="utf8DecodeText" class="form-label">UTF-8十六进制编码</label>
-                                <textarea class="form-control" id="utf8DecodeText" rows="4" placeholder="输入要解码的UTF-8十六进制编码"></textarea>
-                            </div>
-                            <button type="button" id="utf8DecodeBtn" class="btn btn-primary">
-                                <i class="fas fa-arrow-up me-1"></i> 解码为文本
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="utf8DecodeResult" style="display:none;"></div>
+                    <div class="d-flex">
+                        <button type="button" id="textToHexBtn" class="btn btn-success me-2">
+                            <i class="fas fa-arrow-down me-1"></i> 编码
+                        </button>
+                        <button type="button" id="hexToTextBtn" class="btn btn-secondary">
+                            <i class="fas fa-arrow-up me-1"></i> 解码
+                        </button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 十六进制编码标签页 -->
-    <div class="tab-pane fade" id="hex" role="tabpanel" aria-labelledby="hex-tab">
-        <div class="card mb-4">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0"><i class="fas fa-calculator me-2"></i>十六进制编码</h5>
-            </div>
-            <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>十六进制编码原理</h5>
-                    <p>十六进制编码是将二进制数据转换为使用16个字符(0-9, A-F)表示的形式，每个字节表示为两个十六进制字符：</p>
-                    <ul>
-                        <li><strong>字符集</strong>: 0-9, A-F (或 a-f，大小写均可)</li>
-                        <li><strong>表示范围</strong>: 每个字节(8位)用两个十六进制字符表示</li>
-                        <li><strong>优点</strong>: 简洁、易读，常用于表示二进制数据、内存地址等</li>
-                        <li><strong>应用</strong>: 程序调试、MD5/SHA哈希值表示、RGB颜色值等</li>
-                    </ul>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6">
-                        <h5>十六进制编码</h5>
-                        <form id="hexEncodeForm">
-                            <div class="mb-3">
-                                <label for="hexEncodeText" class="form-label">原始文本</label>
-                                <textarea class="form-control" id="hexEncodeText" rows="4" placeholder="输入要编码的文本"></textarea>
-                            </div>
-                            <button type="button" id="hexEncodeBtn" class="btn btn-secondary">
-                                <i class="fas fa-arrow-down me-1"></i> 编码为十六进制
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="hexEncodeResult" style="display:none;"></div>
-                    </div>
-                    
-                    <div class="col-md-6">
-                        <h5>十六进制解码</h5>
-                        <form id="hexDecodeForm">
-                            <div class="mb-3">
-                                <label for="hexDecodeText" class="form-label">十六进制编码</label>
-                                <textarea class="form-control" id="hexDecodeText" rows="4" placeholder="输入要解码的十六进制编码"></textarea>
-                            </div>
-                            <button type="button" id="hexDecodeBtn" class="btn btn-primary">
-                                <i class="fas fa-arrow-up me-1"></i> 解码为文本
-                            </button>
-                        </form>
-                        <div class="result-area mt-3" id="hexDecodeResult" style="display:none;"></div>
-                    </div>
-                </div>
+                </form>
+                <div class="result-area mt-3" id="utf8Result" style="display:none;"></div>
             </div>
         </div>
     </div>
@@ -205,14 +95,14 @@
 <script>
 $(document).ready(function() {
     // Base64编码
-    $('#base64EncodeBtn').click(function() {
-        const text = $('#base64EncodeText').val();
-        const urlSafe = $('#urlSafeEncode').is(':checked');
+    $('#encodeBase64Btn').click(function() {
+        const text = $('#base64Input').val();
+        const urlSafe = $('#urlSafeCheckbox').is(':checked');
         const button = this;
         const originalText = $(button).html();
         
         if (!text) {
-            showResult('#base64EncodeResult', '文本不能为空', false);
+            showResult('#base64Result', '文本不能为空', false);
             return;
         }
         
@@ -227,31 +117,31 @@ $(document).ready(function() {
             data: JSON.stringify({ text: text }),
             success: function(response) {
                 if (response.success) {
-                    showResult('#base64EncodeResult', response.data.encoded);
+                    showResult('#base64Result', response.data.encoded);
                     // 自动填充解码表单
-                    $('#base64DecodeText').val(response.data.encoded);
-                    $('#urlSafeDecode').prop('checked', urlSafe);
+                    $('#base64Input').val(response.data.encoded);
+                    $('#urlSafeCheckbox').prop('checked', urlSafe);
                 } else {
-                    showResult('#base64EncodeResult', response.message, false);
+                    showResult('#base64Result', response.message, false);
                 }
                 hideLoading(button, originalText);
             },
             error: function(xhr, status, error) {
-                showResult('#base64EncodeResult', handleAjaxError(xhr, status, error), false);
+                showResult('#base64Result', handleAjaxError(xhr, status, error), false);
                 hideLoading(button, originalText);
             }
         });
     });
     
     // Base64解码
-    $('#base64DecodeBtn').click(function() {
-        const encoded = $('#base64DecodeText').val();
-        const urlSafe = $('#urlSafeDecode').is(':checked');
+    $('#decodeBase64Btn').click(function() {
+        const encoded = $('#base64Input').val();
+        const urlSafe = $('#urlSafeCheckbox').is(':checked');
         const button = this;
         const originalText = $(button).html();
         
         if (!encoded) {
-            showResult('#base64DecodeResult', '编码后的文本不能为空', false);
+            showResult('#base64Result', '编码后的文本不能为空', false);
             return;
         }
         
@@ -266,27 +156,27 @@ $(document).ready(function() {
             data: JSON.stringify({ encoded: encoded }),
             success: function(response) {
                 if (response.success) {
-                    showResult('#base64DecodeResult', response.data.text);
+                    showResult('#base64Result', response.data.text);
                 } else {
-                    showResult('#base64DecodeResult', response.message, false);
+                    showResult('#base64Result', response.message, false);
                 }
                 hideLoading(button, originalText);
             },
             error: function(xhr, status, error) {
-                showResult('#base64DecodeResult', handleAjaxError(xhr, status, error), false);
+                showResult('#base64Result', handleAjaxError(xhr, status, error), false);
                 hideLoading(button, originalText);
             }
         });
     });
     
     // UTF-8编码
-    $('#utf8EncodeBtn').click(function() {
-        const text = $('#utf8EncodeText').val();
+    $('#textToHexBtn').click(function() {
+        const text = $('#utf8Input').val();
         const button = this;
         const originalText = $(button).html();
         
         if (!text) {
-            showResult('#utf8EncodeResult', '文本不能为空', false);
+            showResult('#utf8Result', '文本不能为空', false);
             return;
         }
         
@@ -299,29 +189,29 @@ $(document).ready(function() {
             data: JSON.stringify({ text: text }),
             success: function(response) {
                 if (response.success) {
-                    showResult('#utf8EncodeResult', response.data.encoded);
+                    showResult('#utf8Result', response.data.encoded);
                     // 自动填充解码表单
-                    $('#utf8DecodeText').val(response.data.encoded);
+                    $('#utf8Input').val(response.data.encoded);
                 } else {
-                    showResult('#utf8EncodeResult', response.message, false);
+                    showResult('#utf8Result', response.message, false);
                 }
                 hideLoading(button, originalText);
             },
             error: function(xhr, status, error) {
-                showResult('#utf8EncodeResult', handleAjaxError(xhr, status, error), false);
+                showResult('#utf8Result', handleAjaxError(xhr, status, error), false);
                 hideLoading(button, originalText);
             }
         });
     });
     
     // UTF-8解码
-    $('#utf8DecodeBtn').click(function() {
-        const encoded = $('#utf8DecodeText').val();
+    $('#hexToTextBtn').click(function() {
+        const encoded = $('#utf8Input').val();
         const button = this;
         const originalText = $(button).html();
         
         if (!encoded) {
-            showResult('#utf8DecodeResult', '编码后的文本不能为空', false);
+            showResult('#utf8Result', '编码后的文本不能为空', false);
             return;
         }
         
@@ -334,82 +224,14 @@ $(document).ready(function() {
             data: JSON.stringify({ encoded: encoded }),
             success: function(response) {
                 if (response.success) {
-                    showResult('#utf8DecodeResult', response.data.text);
+                    showResult('#utf8Result', response.data.text);
                 } else {
-                    showResult('#utf8DecodeResult', response.message, false);
+                    showResult('#utf8Result', response.message, false);
                 }
                 hideLoading(button, originalText);
             },
             error: function(xhr, status, error) {
-                showResult('#utf8DecodeResult', handleAjaxError(xhr, status, error), false);
-                hideLoading(button, originalText);
-            }
-        });
-    });
-    
-    // 十六进制编码
-    $('#hexEncodeBtn').click(function() {
-        const text = $('#hexEncodeText').val();
-        const button = this;
-        const originalText = $(button).html();
-        
-        if (!text) {
-            showResult('#hexEncodeResult', '文本不能为空', false);
-            return;
-        }
-        
-        showLoading(button);
-        
-        $.ajax({
-            url: '/api/encoding/hex-encode',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ text: text }),
-            success: function(response) {
-                if (response.success) {
-                    showResult('#hexEncodeResult', response.data.encoded);
-                    // 自动填充解码表单
-                    $('#hexDecodeText').val(response.data.encoded);
-                } else {
-                    showResult('#hexEncodeResult', response.message, false);
-                }
-                hideLoading(button, originalText);
-            },
-            error: function(xhr, status, error) {
-                showResult('#hexEncodeResult', handleAjaxError(xhr, status, error), false);
-                hideLoading(button, originalText);
-            }
-        });
-    });
-    
-    // 十六进制解码
-    $('#hexDecodeBtn').click(function() {
-        const encoded = $('#hexDecodeText').val();
-        const button = this;
-        const originalText = $(button).html();
-        
-        if (!encoded) {
-            showResult('#hexDecodeResult', '编码后的文本不能为空', false);
-            return;
-        }
-        
-        showLoading(button);
-        
-        $.ajax({
-            url: '/api/encoding/hex-decode',
-            method: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({ encoded: encoded }),
-            success: function(response) {
-                if (response.success) {
-                    showResult('#hexDecodeResult', response.data.text);
-                } else {
-                    showResult('#hexDecodeResult', response.message, false);
-                }
-                hideLoading(button, originalText);
-            },
-            error: function(xhr, status, error) {
-                showResult('#hexDecodeResult', handleAjaxError(xhr, status, error), false);
+                showResult('#utf8Result', handleAjaxError(xhr, status, error), false);
                 hideLoading(button, originalText);
             }
         });

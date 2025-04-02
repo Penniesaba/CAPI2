@@ -38,17 +38,6 @@
                 <h5 class="mb-0"><i class="fas fa-fingerprint me-2"></i>哈希函数</h5>
             </div>
             <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>哈希函数原理</h5>
-                    <p>哈希函数是将任意长度的数据映射为固定长度输出的函数。主要特点：</p>
-                    <ul>
-                        <li><strong>单向性</strong>：从哈希值几乎不可能逆向推导出原始数据</li>
-                        <li><strong>确定性</strong>：相同的输入总是产生相同的输出</li>
-                        <li><strong>抗碰撞性</strong>：找到产生相同哈希值的两个不同输入非常困难</li>
-                        <li><strong>雪崩效应</strong>：输入的微小变化导致输出的显著变化</li>
-                    </ul>
-                </div>
-                
                 <form id="hashForm">
                     <div class="mb-3">
                         <label for="hashMessage" class="form-label">消息</label>
@@ -84,54 +73,6 @@
                     </button>
                 </form>
                 <div class="result-area mt-3" id="hashResult" style="display:none;"></div>
-                
-                <hr class="my-4">
-                
-                <h5 class="mb-3">算法比较</h5>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>算法</th>
-                                <th>输出长度</th>
-                                <th>安全性</th>
-                                <th>主要用途</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>SHA1</td>
-                                <td>160位 (20字节)</td>
-                                <td>已被证明不够安全，存在碰撞攻击</td>
-                                <td>历史遗留系统，不推荐用于新系统</td>
-                            </tr>
-                            <tr>
-                                <td>SHA256</td>
-                                <td>256位 (32字节)</td>
-                                <td>强抗碰撞性，被广泛使用</td>
-                                <td>数字签名、证书、区块链</td>
-                            </tr>
-                            <tr>
-                                <td>SHA3-256</td>
-                                <td>256位 (32字节)</td>
-                                <td>更强的安全性，抵抗量子计算</td>
-                                <td>高安全性要求的应用</td>
-                            </tr>
-                            <tr>
-                                <td>SHA3-512</td>
-                                <td>512位 (64字节)</td>
-                                <td>最高级别安全性</td>
-                                <td>关键系统和长期数据保护</td>
-                            </tr>
-                            <tr>
-                                <td>RIPEMD160</td>
-                                <td>160位 (20字节)</td>
-                                <td>良好，但已不是最强</td>
-                                <td>比特币地址生成</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
             </div>
         </div>
     </div>
@@ -143,16 +84,6 @@
                 <h5 class="mb-0"><i class="fas fa-signature me-2"></i>HMAC (消息认证码)</h5>
             </div>
             <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>HMAC原理</h5>
-                    <p>HMAC (Hash-based Message Authentication Code) 是结合哈希函数和密钥的消息认证技术，可以：</p>
-                    <ul>
-                        <li><strong>验证完整性</strong>：确保消息未被篡改</li>
-                        <li><strong>身份认证</strong>：证明消息来自预期的发送者</li>
-                        <li><strong>加入密钥</strong>：基于哈希算法，但通过引入密钥增强安全性</li>
-                    </ul>
-                </div>
-                
                 <form id="hmacForm">
                     <div class="mb-3">
                         <label for="hmacMessage" class="form-label">消息</label>
@@ -185,36 +116,6 @@
                     </button>
                 </form>
                 <div class="result-area mt-3" id="hmacResult" style="display:none;"></div>
-                
-                <hr class="my-4">
-                
-                <h5>HMAC应用场景</h5>
-                <div class="row mt-3">
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-header bg-success text-white">API认证</div>
-                            <div class="card-body">
-                                <p>用于验证API请求的完整性和来源，防止请求被篡改或伪造。</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-header bg-success text-white">会话令牌</div>
-                            <div class="card-body">
-                                <p>生成防篡改的会话令牌，确保用户数据不被修改。</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <div class="card h-100">
-                            <div class="card-header bg-success text-white">密码存储</div>
-                            <div class="card-body">
-                                <p>作为PBKDF2等密钥派生函数的基础，用于安全存储密码。</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -226,17 +127,6 @@
                 <h5 class="mb-0"><i class="fas fa-key me-2"></i>PBKDF2 (密钥派生)</h5>
             </div>
             <div class="card-body">
-                <div class="algorithm-theory">
-                    <h5><i class="fas fa-info-circle me-2"></i>PBKDF2原理</h5>
-                    <p>PBKDF2 (Password-Based Key Derivation Function 2) 是一种密钥派生函数，专为密码哈希设计，主要特点：</p>
-                    <ul>
-                        <li><strong>盐值</strong>：加入随机盐值，防止彩虹表攻击</li>
-                        <li><strong>可配置迭代次数</strong>：通过增加迭代次数增加暴力破解难度</li>
-                        <li><strong>灵活输出长度</strong>：可根据需要生成指定长度的密钥</li>
-                        <li><strong>使用HMAC</strong>：内部使用HMAC函数增强安全性</li>
-                    </ul>
-                </div>
-                
                 <ul class="nav nav-tabs mb-3" id="pbkdf2SubTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="pbkdf2-generate-tab" data-bs-toggle="tab" data-bs-target="#pbkdf2-generate" type="button" role="tab" aria-controls="pbkdf2-generate" aria-selected="true">密钥派生</button>
