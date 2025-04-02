@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}首页 - 密码算法实现平台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="p-5 mb-4 bg-light rounded-3">
+            <div class="container-fluid py-3">
+                <h1 class="display-5 fw-bold">密码算法实现平台</h1>
+                <p class="col-md-8 fs-4">提供多种密码学算法的Web实现，支持对称加密、哈希算法、编码算法和非对称加密等功能。</p>
+                <p class="fs-5">可通过Web界面使用，也可通过API接口调用。</p>
+                <a href="{{ url_for('web.docs') }}" class="btn btn-primary btn-lg">查看API文档</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12 mb-4">
+        <h2 class="mb-4">支持的算法</h2>
+    </div>
+</div>
+
+<div class="row">
+    <!-- 对称加密 -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-key me-2"></i>对称加密算法
+            </div>
+            <div class="card-body">
+                <p class="card-text">使用相同密钥进行加密和解密的算法。</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">AES (高级加密标准)</li>
+                    <li class="list-group-item">SM4 (国密对称加密)</li>
+                    <li class="list-group-item">RC6 (Rivest加密)</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('web.symmetric') }}" class="btn btn-outline-primary btn-sm w-100">
+                    立即使用 <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 哈希算法 -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <i class="fas fa-hashtag me-2"></i>哈希算法
+            </div>
+            <div class="card-body">
+                <p class="card-text">将任意长度的数据映射为固定长度输出的算法。</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">SHA1 / SHA256 / SHA3</li>
+                    <li class="list-group-item">RIPEMD160</li>
+                    <li class="list-group-item">HMAC (消息认证码)</li>
+                    <li class="list-group-item">PBKDF2 (密钥派生)</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('web.hash_functions') }}" class="btn btn-outline-success btn-sm w-100">
+                    立即使用 <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编码算法 -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <i class="fas fa-code me-2"></i>编码算法
+            </div>
+            <div class="card-body">
+                <p class="card-text">数据格式转换算法，用于不同场景的数据表示。</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">Base64编码</li>
+                    <li class="list-group-item">URL安全的Base64</li>
+                    <li class="list-group-item">UTF-8编码</li>
+                    <li class="list-group-item">十六进制编码</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('web.encoding') }}" class="btn btn-outline-warning btn-sm w-100">
+                    立即使用 <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 非对称加密 -->
+    <div class="col-md-3 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <i class="fas fa-unlock-alt me-2"></i>非对称加密算法
+            </div>
+            <div class="card-body">
+                <p class="card-text">使用公钥和私钥对的算法，支持加密和数字签名。</p>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">RSA (1024位)</li>
+                    <li class="list-group-item">ECC (椭圆曲线加密)</li>
+                    <li class="list-group-item">RSA-SHA1 (签名)</li>
+                    <li class="list-group-item">ECDSA (椭圆曲线签名)</li>
+                </ul>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('web.asymmetric') }}" class="btn btn-outline-danger btn-sm w-100">
+                    立即使用 <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="fas fa-server me-2"></i>API接口示例
+            </div>
+            <div class="card-body">
+                <p>所有功能均可通过API接口调用，示例如下：</p>
+                <div class="bg-light p-3 rounded">
+                    <pre class="mb-0"><code>
+// SHA256哈希计算示例
+fetch('/api/hash/sha256', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+        message: "Hello, World!"
+    })
+})
+.then(response => response.json())
+.then(data => {
+    console.log(data);
+    // 输出: {
+    //   "success": true,
+    //   "data": {
+    //     "hash": "dffd6021bb2bd5b0af676290809ec3a53191dd81c7f70a4b28688a362182986f"
+    //   },
+    //   "message": "SHA256哈希计算成功"
+    // }
+});
+                    </code></pre>
+                </div>
+                <p class="mt-3">查看 <a href="{{ url_for('web.docs') }}">API文档</a> 获取更多信息。</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

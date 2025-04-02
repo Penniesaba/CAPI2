@@ -1,0 +1,733 @@
+{% extends "base.html" %}
+
+{% block title %}非对称加密算法 - 密码算法实现平台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-unlock-alt me-2"></i>非对称加密算法</h1>
+        <p class="lead">非对称加密算法使用一对密钥（公钥和私钥），可用于加密和数字签名。</p>
+    </div>
+</div>
+
+<!-- 算法选择标签页 -->
+<ul class="nav nav-pills mb-4" id="asymmetricTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="rsa-tab" data-bs-toggle="pill" data-bs-target="#rsa" type="button" role="tab" aria-controls="rsa" aria-selected="true">
+            <i class="fas fa-key me-1"></i>RSA算法
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="ecc-tab" data-bs-toggle="pill" data-bs-target="#ecc" type="button" role="tab" aria-controls="ecc" aria-selected="false">
+            <i class="fas fa-ellipsis-h me-1"></i>ECC算法
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="signature-tab" data-bs-toggle="pill" data-bs-target="#signature" type="button" role="tab" aria-controls="signature" aria-selected="false">
+            <i class="fas fa-signature me-1"></i>数字签名
+        </button>
+    </li>
+</ul>
+
+<!-- 标签页内容 -->
+<div class="tab-content" id="asymmetricTabsContent">
+    <!-- RSA标签页 -->
+    <div class="tab-pane fade show active" id="rsa" role="tabpanel" aria-labelledby="rsa-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i>RSA算法</h5>
+            </div>
+            <div class="card-body">
+                <div class="algorithm-theory">
+                    <h5><i class="fas fa-info-circle me-2"></i>RSA算法原理</h5>
+                    <p>RSA是一种基于大整数因子分解困难性的非对称加密算法，由Rivest、Shamir和Adleman三人提出。核心原理：</p>
+                    <ul>
+                        <li><strong>密钥生成</strong>: 选择两个大质数p和q，计算n=p*q和欧拉函数φ(n)=(p-1)*(q-1)，选择公钥e和私钥d，使得e*d ≡ 1 (mod φ(n))</li>
+                        <li><strong>加密</strong>: c = m<sup>e</sup> mod n（m为明文，c为密文）</li>
+                        <li><strong>解密</strong>: m = c<sup>d</sup> mod n</li>
+                        <li><strong>安全性</strong>: 基于大整数因子分解问题的困难性</li>
+                    </ul>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>生成RSA密钥对</h5>
+                        <form id="rsaKeyForm">
+                            <div class="mb-3">
+                                <label for="rsaKeySize" class="form-label">密钥大小</label>
+                                <select class="form-select" id="rsaKeySize">
+                                    <option value="1024" selected>1024位</option>
+                                    <option value="2048">2048位</option>
+                                    <option value="3072">3072位</option>
+                                    <option value="4096">4096位</option>
+                                </select>
+                            </div>
+                            <button type="button" id="generateRsaKeyBtn" class="btn btn-danger">
+                                <i class="fas fa-key me-1"></i> 生成RSA密钥对
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rsaPrivateKeyResult" style="display:none;">
+                            <h6>私钥 (私密，不要共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="rsaPrivateKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="result-area mt-3" id="rsaPublicKeyResult" style="display:none;">
+                            <h6>公钥 (可安全共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="rsaPublicKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>RSA加密</h5>
+                        <form id="rsaEncryptForm">
+                            <div class="mb-3">
+                                <label for="rsaEncryptPlaintext" class="form-label">明文</label>
+                                <textarea class="form-control" id="rsaEncryptPlaintext" rows="3" placeholder="输入要加密的明文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaEncryptPublicKey" class="form-label">公钥 (PEM格式)</label>
+                                <textarea class="form-control" id="rsaEncryptPublicKey" rows="5" placeholder="输入PEM格式的公钥"></textarea>
+                            </div>
+                            <button type="button" id="rsaEncryptBtn" class="btn btn-danger">
+                                <i class="fas fa-lock me-1"></i> 加密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rsaEncryptResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>RSA解密</h5>
+                        <form id="rsaDecryptForm">
+                            <div class="mb-3">
+                                <label for="rsaDecryptCiphertext" class="form-label">密文 (Base64)</label>
+                                <textarea class="form-control" id="rsaDecryptCiphertext" rows="3" placeholder="输入Base64编码的密文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaDecryptPrivateKey" class="form-label">私钥 (PEM格式)</label>
+                                <textarea class="form-control" id="rsaDecryptPrivateKey" rows="5" placeholder="输入PEM格式的私钥"></textarea>
+                            </div>
+                            <button type="button" id="rsaDecryptBtn" class="btn btn-primary">
+                                <i class="fas fa-unlock me-1"></i> 解密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rsaDecryptResult" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ECC标签页 -->
+    <div class="tab-pane fade" id="ecc" role="tabpanel" aria-labelledby="ecc-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-ellipsis-h me-2"></i>ECC (椭圆曲线加密)</h5>
+            </div>
+            <div class="card-body">
+                <div class="algorithm-theory">
+                    <h5><i class="fas fa-info-circle me-2"></i>ECC算法原理</h5>
+                    <p>椭圆曲线密码学(ECC)是基于椭圆曲线上的离散对数问题的非对称加密算法。核心原理：</p>
+                    <ul>
+                        <li><strong>椭圆曲线方程</strong>: y² = x³ + ax + b</li>
+                        <li><strong>点加法</strong>: 椭圆曲线上定义的一种特殊的加法运算</li>
+                        <li><strong>标量乘法</strong>: 将点加法进行多次（类似于普通乘法）</li>
+                        <li><strong>离散对数问题</strong>: 给定点P和Q=kP，求解k在计算上是困难的</li>
+                        <li><strong>安全性</strong>: ECC使用更短的密钥长度提供与RSA相当的安全性</li>
+                    </ul>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>生成ECC密钥对</h5>
+                        <form id="eccKeyForm">
+                            <div class="mb-3">
+                                <label for="eccCurve" class="form-label">选择椭圆曲线</label>
+                                <select class="form-select" id="eccCurve">
+                                    <option value="P-256" selected>P-256 (推荐)</option>
+                                    <option value="P-384">P-384</option>
+                                    <option value="P-521">P-521</option>
+                                </select>
+                            </div>
+                            <button type="button" id="generateEccKeyBtn" class="btn btn-primary">
+                                <i class="fas fa-key me-1"></i> 生成ECC密钥对
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="eccPrivateKeyResult" style="display:none;">
+                            <h6>私钥 (私密，不要共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="eccPrivateKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="result-area mt-3" id="eccPublicKeyResult" style="display:none;">
+                            <h6>公钥 (可安全共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="eccPublicKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">ECC优势</div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <i class="fas fa-check-circle text-success me-2"></i>更短的密钥长度
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-check-circle text-success me-2"></i>更低的计算复杂度
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-check-circle text-success me-2"></i>更高的安全性
+                                    </li>
+                                    <li class="list-group-item">
+                                        <i class="fas fa-check-circle text-success me-2"></i>适用于资源受限设备
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <strong>注意</strong>: 本平台主要提供ECC密钥生成和ECDSA数字签名功能。ECC加密通常使用ECIES (Elliptic Curve Integrated Encryption Scheme) 或与对称加密结合使用。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 数字签名标签页 -->
+    <div class="tab-pane fade" id="signature" role="tabpanel" aria-labelledby="signature-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-signature me-2"></i>数字签名</h5>
+            </div>
+            <div class="card-body">
+                <div class="algorithm-theory">
+                    <h5><i class="fas fa-info-circle me-2"></i>数字签名原理</h5>
+                    <p>数字签名使用私钥创建消息的签名，可以使用对应的公钥验证签名的真实性。核心原理：</p>
+                    <ul>
+                        <li><strong>签名过程</strong>: 使用发送者的私钥对消息（或消息哈希）进行加密</li>
+                        <li><strong>验证过程</strong>: 使用发送者的公钥解密签名，并与原始消息（或消息哈希）比较</li>
+                        <li><strong>应用</strong>: 身份认证、数据完整性验证、不可否认性</li>
+                    </ul>
+                </div>
+                
+                <!-- RSA签名部分 -->
+                <h5 class="mt-4">RSA签名</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>RSA签名生成</h6>
+                        <form id="rsaSignForm">
+                            <div class="mb-3">
+                                <label for="rsaSignMessage" class="form-label">原始消息</label>
+                                <textarea class="form-control" id="rsaSignMessage" rows="3" placeholder="输入要签名的消息"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaSignPrivateKey" class="form-label">私钥 (PEM格式)</label>
+                                <textarea class="form-control" id="rsaSignPrivateKey" rows="5" placeholder="输入PEM格式的私钥"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaSignHashAlgorithm" class="form-label">哈希算法</label>
+                                <select class="form-select" id="rsaSignHashAlgorithm">
+                                    <option value="SHA1" selected>SHA1</option>
+                                    <option value="SHA256">SHA256</option>
+                                </select>
+                            </div>
+                            <button type="button" id="rsaSignBtn" class="btn btn-success">
+                                <i class="fas fa-signature me-1"></i> 生成签名
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rsaSignResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>RSA签名验证</h6>
+                        <form id="rsaVerifyForm">
+                            <div class="mb-3">
+                                <label for="rsaVerifyMessage" class="form-label">原始消息</label>
+                                <textarea class="form-control" id="rsaVerifyMessage" rows="3" placeholder="输入原始消息"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaVerifySignature" class="form-label">签名 (Base64)</label>
+                                <textarea class="form-control" id="rsaVerifySignature" rows="3" placeholder="输入Base64编码的签名"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaVerifyPublicKey" class="form-label">公钥 (PEM格式)</label>
+                                <textarea class="form-control" id="rsaVerifyPublicKey" rows="5" placeholder="输入PEM格式的公钥"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rsaVerifyHashAlgorithm" class="form-label">哈希算法</label>
+                                <select class="form-select" id="rsaVerifyHashAlgorithm">
+                                    <option value="SHA1" selected>SHA1</option>
+                                    <option value="SHA256">SHA256</option>
+                                </select>
+                            </div>
+                            <button type="button" id="rsaVerifyBtn" class="btn btn-primary">
+                                <i class="fas fa-check-circle me-1"></i> 验证签名
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rsaVerifyResult" style="display:none;"></div>
+                    </div>
+                </div>
+                
+                <hr class="my-4">
+                
+                <!-- ECDSA签名部分 -->
+                <h5 class="mt-4">ECDSA签名</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>ECDSA密钥生成</h6>
+                        <form id="ecdsaKeyForm">
+                            <button type="button" id="generateEcdsaKeyBtn" class="btn btn-success">
+                                <i class="fas fa-key me-1"></i> 生成ECDSA密钥对
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="ecdsaPrivateKeyResult" style="display:none;">
+                            <h6>私钥 (私密，不要共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="ecdsaPrivateKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                        <div class="result-area mt-3" id="ecdsaPublicKeyResult" style="display:none;">
+                            <h6>公钥 (可安全共享)</h6>
+                            <div class="mb-3">
+                                <textarea class="form-control" id="ecdsaPublicKey" rows="5" readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h6>ECDSA签名生成</h6>
+                        <form id="ecdsaSignForm">
+                            <div class="mb-3">
+                                <label for="ecdsaSignMessage" class="form-label">原始消息</label>
+                                <textarea class="form-control" id="ecdsaSignMessage" rows="3" placeholder="输入要签名的消息"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="ecdsaSignPrivateKey" class="form-label">私钥 (PEM格式)</label>
+                                <textarea class="form-control" id="ecdsaSignPrivateKey" rows="5" placeholder="输入PEM格式的私钥"></textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="ecdsaDeterministic" checked>
+                                <label class="form-check-label" for="ecdsaDeterministic">使用确定性ECDSA (RFC 6979)</label>
+                            </div>
+                            <button type="button" id="ecdsaSignBtn" class="btn btn-success">
+                                <i class="fas fa-signature me-1"></i> 生成签名
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="ecdsaSignResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h6>ECDSA签名验证</h6>
+                        <form id="ecdsaVerifyForm">
+                            <div class="mb-3">
+                                <label for="ecdsaVerifyMessage" class="form-label">原始消息</label>
+                                <textarea class="form-control" id="ecdsaVerifyMessage" rows="3" placeholder="输入原始消息"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="ecdsaVerifySignature" class="form-label">签名 (十六进制)</label>
+                                <textarea class="form-control" id="ecdsaVerifySignature" rows="3" placeholder="输入十六进制编码的签名"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="ecdsaVerifyPublicKey" class="form-label">公钥 (PEM格式)</label>
+                                <textarea class="form-control" id="ecdsaVerifyPublicKey" rows="5" placeholder="输入PEM格式的公钥"></textarea>
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="ecdsaVerifyDeterministic" checked>
+                                <label class="form-check-label" for="ecdsaVerifyDeterministic">使用确定性ECDSA (RFC 6979)</label>
+                            </div>
+                            <button type="button" id="ecdsaVerifyBtn" class="btn btn-primary">
+                                <i class="fas fa-check-circle me-1"></i> 验证签名
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="ecdsaVerifyResult" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // RSA密钥生成
+    $('#generateRsaKeyBtn').click(function() {
+        const keySize = $('#rsaKeySize').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/rsa/generate-key-pair',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key_size: parseInt(keySize) }),
+            success: function(response) {
+                if (response.success) {
+                    // 显示私钥
+                    $('#rsaPrivateKey').val(response.data.private_key);
+                    $('#rsaPrivateKeyResult').show();
+                    
+                    // 显示公钥
+                    $('#rsaPublicKey').val(response.data.public_key);
+                    $('#rsaPublicKeyResult').show();
+                    
+                    // 自动填充加密和解密表单
+                    $('#rsaEncryptPublicKey').val(response.data.public_key);
+                    $('#rsaDecryptPrivateKey').val(response.data.private_key);
+                    
+                    // 自动填充签名表单
+                    $('#rsaSignPrivateKey').val(response.data.private_key);
+                    $('#rsaVerifyPublicKey').val(response.data.public_key);
+                } else {
+                    alert(response.message);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                alert(handleAjaxError(xhr, status, error));
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RSA加密
+    $('#rsaEncryptBtn').click(function() {
+        const plaintext = $('#rsaEncryptPlaintext').val();
+        const publicKey = $('#rsaEncryptPublicKey').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!plaintext || !publicKey) {
+            showResult('#rsaEncryptResult', '明文和公钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/rsa/encrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                plaintext: plaintext,
+                public_key: publicKey
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rsaEncryptResult', response.data.ciphertext);
+                    // 自动填充解密表单
+                    $('#rsaDecryptCiphertext').val(response.data.ciphertext);
+                } else {
+                    showResult('#rsaEncryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rsaEncryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RSA解密
+    $('#rsaDecryptBtn').click(function() {
+        const ciphertext = $('#rsaDecryptCiphertext').val();
+        const privateKey = $('#rsaDecryptPrivateKey').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!ciphertext || !privateKey) {
+            showResult('#rsaDecryptResult', '密文和私钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/rsa/decrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                ciphertext: ciphertext,
+                private_key: privateKey
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rsaDecryptResult', response.data.plaintext);
+                } else {
+                    showResult('#rsaDecryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rsaDecryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // ECC密钥生成
+    $('#generateEccKeyBtn').click(function() {
+        const curve = $('#eccCurve').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/ecc/generate-key-pair',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ curve: curve }),
+            success: function(response) {
+                if (response.success) {
+                    // 显示私钥
+                    $('#eccPrivateKey').val(response.data.private_key);
+                    $('#eccPrivateKeyResult').show();
+                    
+                    // 显示公钥
+                    $('#eccPublicKey').val(response.data.public_key);
+                    $('#eccPublicKeyResult').show();
+                } else {
+                    alert(response.message);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                alert(handleAjaxError(xhr, status, error));
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RSA签名
+    $('#rsaSignBtn').click(function() {
+        const message = $('#rsaSignMessage').val();
+        const privateKey = $('#rsaSignPrivateKey').val();
+        const hashAlgorithm = $('#rsaSignHashAlgorithm').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!message || !privateKey) {
+            showResult('#rsaSignResult', '消息和私钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/rsa/sign',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                message: message,
+                private_key: privateKey,
+                hash_algorithm: hashAlgorithm
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rsaSignResult', response.data.signature);
+                    
+                    // 自动填充验证表单
+                    $('#rsaVerifyMessage').val(message);
+                    $('#rsaVerifySignature').val(response.data.signature);
+                    $('#rsaVerifyHashAlgorithm').val(hashAlgorithm);
+                } else {
+                    showResult('#rsaSignResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rsaSignResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RSA签名验证
+    $('#rsaVerifyBtn').click(function() {
+        const message = $('#rsaVerifyMessage').val();
+        const signature = $('#rsaVerifySignature').val();
+        const publicKey = $('#rsaVerifyPublicKey').val();
+        const hashAlgorithm = $('#rsaVerifyHashAlgorithm').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!message || !signature || !publicKey) {
+            showResult('#rsaVerifyResult', '消息、签名和公钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/rsa/verify',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                message: message,
+                signature: signature,
+                public_key: publicKey,
+                hash_algorithm: hashAlgorithm
+            }),
+            success: function(response) {
+                if (response.success) {
+                    const verified = response.data.verified;
+                    const resultText = verified ? '验证成功：签名有效' : '验证失败：签名无效';
+                    showResult('#rsaVerifyResult', resultText, verified);
+                } else {
+                    showResult('#rsaVerifyResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rsaVerifyResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // ECDSA密钥生成
+    $('#generateEcdsaKeyBtn').click(function() {
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/ecdsa/generate-key-pair',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({}),
+            success: function(response) {
+                if (response.success) {
+                    // 显示私钥
+                    $('#ecdsaPrivateKey').val(response.data.private_key);
+                    $('#ecdsaPrivateKeyResult').show();
+                    
+                    // 显示公钥
+                    $('#ecdsaPublicKey').val(response.data.public_key);
+                    $('#ecdsaPublicKeyResult').show();
+                    
+                    // 自动填充签名表单
+                    $('#ecdsaSignPrivateKey').val(response.data.private_key);
+                    $('#ecdsaVerifyPublicKey').val(response.data.public_key);
+                } else {
+                    alert(response.message);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                alert(handleAjaxError(xhr, status, error));
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // ECDSA签名
+    $('#ecdsaSignBtn').click(function() {
+        const message = $('#ecdsaSignMessage').val();
+        const privateKey = $('#ecdsaSignPrivateKey').val();
+        const deterministic = $('#ecdsaDeterministic').is(':checked');
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!message || !privateKey) {
+            showResult('#ecdsaSignResult', '消息和私钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/ecdsa/sign',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                message: message,
+                private_key: privateKey,
+                deterministic: deterministic
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#ecdsaSignResult', response.data.signature);
+                    
+                    // 自动填充验证表单
+                    $('#ecdsaVerifyMessage').val(message);
+                    $('#ecdsaVerifySignature').val(response.data.signature);
+                    $('#ecdsaVerifyDeterministic').prop('checked', deterministic);
+                } else {
+                    showResult('#ecdsaSignResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#ecdsaSignResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // ECDSA签名验证
+    $('#ecdsaVerifyBtn').click(function() {
+        const message = $('#ecdsaVerifyMessage').val();
+        const signature = $('#ecdsaVerifySignature').val();
+        const publicKey = $('#ecdsaVerifyPublicKey').val();
+        const deterministic = $('#ecdsaVerifyDeterministic').is(':checked');
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!message || !signature || !publicKey) {
+            showResult('#ecdsaVerifyResult', '消息、签名和公钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/asymmetric/ecdsa/verify',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                message: message,
+                signature: signature,
+                public_key: publicKey,
+                deterministic: deterministic
+            }),
+            success: function(response) {
+                if (response.success) {
+                    const verified = response.data.verified;
+                    const resultText = verified ? '验证成功：签名有效' : '验证失败：签名无效';
+                    showResult('#ecdsaVerifyResult', resultText, verified);
+                } else {
+                    showResult('#ecdsaVerifyResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#ecdsaVerifyResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,633 @@
+{% extends "base.html" %}
+
+{% block title %}对称加密算法 - 密码算法实现平台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-key me-2"></i>对称加密算法</h1>
+        <p class="lead">使用相同密钥进行加密和解密的密码算法，支持AES、SM4和RC6算法。</p>
+    </div>
+</div>
+
+<!-- 算法选择标签页 -->
+<ul class="nav nav-pills mb-4" id="symmetricTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="aes-tab" data-bs-toggle="pill" data-bs-target="#aes" type="button" role="tab" aria-controls="aes" aria-selected="true">
+            <i class="fas fa-shield-alt me-1"></i>AES
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="sm4-tab" data-bs-toggle="pill" data-bs-target="#sm4" type="button" role="tab" aria-controls="sm4" aria-selected="false">
+            <i class="fas fa-dragon me-1"></i>SM4
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="rc6-tab" data-bs-toggle="pill" data-bs-target="#rc6" type="button" role="tab" aria-controls="rc6" aria-selected="false">
+            <i class="fas fa-lock me-1"></i>RC6
+        </button>
+    </li>
+</ul>
+
+<!-- 标签页内容 -->
+<div class="tab-content" id="symmetricTabsContent">
+    <!-- AES标签页 -->
+    <div class="tab-pane fade show active" id="aes" role="tabpanel" aria-labelledby="aes-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>AES (高级加密标准)</h5>
+            </div>
+            <div class="card-body">
+                <p>AES是一种对称分组密码，是目前最流行的对称加密算法之一，支持128位、192位和256位密钥。</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>密钥生成</h5>
+                        <form id="aesKeyForm">
+                            <div class="mb-3">
+                                <label for="aesKeySize" class="form-label">密钥大小</label>
+                                <select class="form-select" id="aesKeySize">
+                                    <option value="128">128位</option>
+                                    <option value="192">192位</option>
+                                    <option value="256" selected>256位</option>
+                                </select>
+                            </div>
+                            <button type="button" id="generateAesKey" class="btn btn-primary">
+                                <i class="fas fa-key me-1"></i> 生成密钥
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="aesKeyResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>加密模式说明</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">ECB (Electronic Codebook): 最简单的模式，不使用IV，但安全性较低</li>
+                            <li class="list-group-item">CBC (Cipher Block Chaining): 使用IV，每个分组与前一个分组相关</li>
+                            <li class="list-group-item">CFB (Cipher Feedback): 将分组密码转为流密码</li>
+                            <li class="list-group-item">OFB (Output Feedback): 生成密钥流，抗差错能力强</li>
+                            <li class="list-group-item">CTR (Counter): 使用计数器，支持并行计算</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5>加密</h5>
+                        <form id="aesEncryptForm">
+                            <div class="mb-3">
+                                <label for="aesEncryptPlaintext" class="form-label">明文</label>
+                                <textarea class="form-control" id="aesEncryptPlaintext" rows="3" placeholder="输入要加密的明文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="aesEncryptKey" class="form-label">密钥 (Base64)</label>
+                                <input type="text" class="form-control" id="aesEncryptKey" placeholder="输入Base64编码的密钥">
+                            </div>
+                            <div class="mb-3">
+                                <label for="aesEncryptMode" class="form-label">加密模式</label>
+                                <select class="form-select" id="aesEncryptMode">
+                                    <option value="ECB">ECB</option>
+                                    <option value="CBC" selected>CBC</option>
+                                    <option value="CFB">CFB</option>
+                                    <option value="OFB">OFB</option>
+                                    <option value="CTR">CTR</option>
+                                </select>
+                            </div>
+                            <button type="button" id="aesEncryptBtn" class="btn btn-success">
+                                <i class="fas fa-lock me-1"></i> 加密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="aesEncryptResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>解密</h5>
+                        <form id="aesDecryptForm">
+                            <div class="mb-3">
+                                <label for="aesDecryptCiphertext" class="form-label">密文 (Base64)</label>
+                                <textarea class="form-control" id="aesDecryptCiphertext" rows="3" placeholder="输入Base64编码的密文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="aesDecryptKey" class="form-label">密钥 (Base64)</label>
+                                <input type="text" class="form-control" id="aesDecryptKey" placeholder="输入Base64编码的密钥">
+                            </div>
+                            <div class="mb-3">
+                                <label for="aesDecryptMode" class="form-label">加密模式</label>
+                                <select class="form-select" id="aesDecryptMode">
+                                    <option value="ECB">ECB</option>
+                                    <option value="CBC" selected>CBC</option>
+                                    <option value="CFB">CFB</option>
+                                    <option value="OFB">OFB</option>
+                                    <option value="CTR">CTR</option>
+                                </select>
+                            </div>
+                            <button type="button" id="aesDecryptBtn" class="btn btn-primary">
+                                <i class="fas fa-unlock me-1"></i> 解密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="aesDecryptResult" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SM4标签页 -->
+    <div class="tab-pane fade" id="sm4" role="tabpanel" aria-labelledby="sm4-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-dragon me-2"></i>SM4 (国密对称加密算法)</h5>
+            </div>
+            <div class="card-body">
+                <p>SM4是中国国家密码管理局认可的分组密码标准，是我国自主设计的对称分组密码算法，分组长度为128位，密钥长度也是128位。</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>密钥生成</h5>
+                        <form id="sm4KeyForm">
+                            <button type="button" id="generateSm4Key" class="btn btn-danger">
+                                <i class="fas fa-key me-1"></i> 生成SM4密钥
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="sm4KeyResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>加密模式说明</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">ECB (Electronic Codebook): 最简单的模式，不使用IV，但安全性较低</li>
+                            <li class="list-group-item">CBC (Cipher Block Chaining): 使用IV，每个分组与前一个分组相关</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5>加密</h5>
+                        <form id="sm4EncryptForm">
+                            <div class="mb-3">
+                                <label for="sm4EncryptPlaintext" class="form-label">明文</label>
+                                <textarea class="form-control" id="sm4EncryptPlaintext" rows="3" placeholder="输入要加密的明文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sm4EncryptKey" class="form-label">密钥 (十六进制)</label>
+                                <input type="text" class="form-control" id="sm4EncryptKey" placeholder="输入十六进制密钥">
+                            </div>
+                            <div class="mb-3">
+                                <label for="sm4EncryptMode" class="form-label">加密模式</label>
+                                <select class="form-select" id="sm4EncryptMode">
+                                    <option value="ECB" selected>ECB</option>
+                                    <option value="CBC">CBC</option>
+                                </select>
+                            </div>
+                            <button type="button" id="sm4EncryptBtn" class="btn btn-success">
+                                <i class="fas fa-lock me-1"></i> 加密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="sm4EncryptResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>解密</h5>
+                        <form id="sm4DecryptForm">
+                            <div class="mb-3">
+                                <label for="sm4DecryptCiphertext" class="form-label">密文 (十六进制)</label>
+                                <textarea class="form-control" id="sm4DecryptCiphertext" rows="3" placeholder="输入十六进制密文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sm4DecryptKey" class="form-label">密钥 (十六进制)</label>
+                                <input type="text" class="form-control" id="sm4DecryptKey" placeholder="输入十六进制密钥">
+                            </div>
+                            <div class="mb-3">
+                                <label for="sm4DecryptMode" class="form-label">加密模式</label>
+                                <select class="form-select" id="sm4DecryptMode">
+                                    <option value="ECB" selected>ECB</option>
+                                    <option value="CBC">CBC</option>
+                                </select>
+                            </div>
+                            <button type="button" id="sm4DecryptBtn" class="btn btn-primary">
+                                <i class="fas fa-unlock me-1"></i> 解密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="sm4DecryptResult" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- RC6标签页 -->
+    <div class="tab-pane fade" id="rc6" role="tabpanel" aria-labelledby="rc6-tab">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-lock me-2"></i>RC6 加密算法</h5>
+            </div>
+            <div class="card-body">
+                <p>RC6是由Ron Rivest等人设计的分组密码，是RC5的后继者，使用了数据依赖性的旋转和乘法运算。本实现使用w=32位字长，r=20轮，128位密钥。</p>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>密钥生成</h5>
+                        <form id="rc6KeyForm">
+                            <button type="button" id="generateRc6Key" class="btn btn-success">
+                                <i class="fas fa-key me-1"></i> 生成RC6密钥
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rc6KeyResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>RC6算法说明</h5>
+                        <ul class="list-group">
+                            <li class="list-group-item">使用分组大小为128位</li>
+                            <li class="list-group-item">使用密钥长度为128位</li>
+                            <li class="list-group-item">采用20轮加密</li>
+                            <li class="list-group-item">使用四个32位寄存器表示</li>
+                            <li class="list-group-item">包含数据依赖性的旋转操作</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <h5>加密</h5>
+                        <form id="rc6EncryptForm">
+                            <div class="mb-3">
+                                <label for="rc6EncryptPlaintext" class="form-label">明文</label>
+                                <textarea class="form-control" id="rc6EncryptPlaintext" rows="3" placeholder="输入要加密的明文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rc6EncryptKey" class="form-label">密钥 (十六进制)</label>
+                                <input type="text" class="form-control" id="rc6EncryptKey" placeholder="输入十六进制密钥">
+                            </div>
+                            <button type="button" id="rc6EncryptBtn" class="btn btn-success">
+                                <i class="fas fa-lock me-1"></i> 加密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rc6EncryptResult" style="display:none;"></div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <h5>解密</h5>
+                        <form id="rc6DecryptForm">
+                            <div class="mb-3">
+                                <label for="rc6DecryptCiphertext" class="form-label">密文 (十六进制)</label>
+                                <textarea class="form-control" id="rc6DecryptCiphertext" rows="3" placeholder="输入十六进制密文"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="rc6DecryptKey" class="form-label">密钥 (十六进制)</label>
+                                <input type="text" class="form-control" id="rc6DecryptKey" placeholder="输入十六进制密钥">
+                            </div>
+                            <button type="button" id="rc6DecryptBtn" class="btn btn-primary">
+                                <i class="fas fa-unlock me-1"></i> 解密
+                            </button>
+                        </form>
+                        <div class="result-area mt-3" id="rc6DecryptResult" style="display:none;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    // AES密钥生成
+    $('#generateAesKey').click(function() {
+        const keySize = $('#aesKeySize').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/aes/generate-key',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ key_size: parseInt(keySize) }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#aesKeyResult', response.data.key);
+                    // 自动填充加密和解密表单的密钥字段
+                    $('#aesEncryptKey').val(response.data.key);
+                    $('#aesDecryptKey').val(response.data.key);
+                } else {
+                    showResult('#aesKeyResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#aesKeyResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // AES加密
+    $('#aesEncryptBtn').click(function() {
+        const plaintext = $('#aesEncryptPlaintext').val();
+        const key = $('#aesEncryptKey').val();
+        const mode = $('#aesEncryptMode').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!plaintext || !key) {
+            showResult('#aesEncryptResult', '明文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/aes/encrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                plaintext: plaintext,
+                key: key,
+                mode: mode
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#aesEncryptResult', response.data.ciphertext);
+                    // 自动填充解密表单
+                    $('#aesDecryptCiphertext').val(response.data.ciphertext);
+                    $('#aesDecryptMode').val(mode);
+                } else {
+                    showResult('#aesEncryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#aesEncryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // AES解密
+    $('#aesDecryptBtn').click(function() {
+        const ciphertext = $('#aesDecryptCiphertext').val();
+        const key = $('#aesDecryptKey').val();
+        const mode = $('#aesDecryptMode').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!ciphertext || !key) {
+            showResult('#aesDecryptResult', '密文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/aes/decrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                ciphertext: ciphertext,
+                key: key,
+                mode: mode
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#aesDecryptResult', response.data.plaintext);
+                } else {
+                    showResult('#aesDecryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#aesDecryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // SM4密钥生成
+    $('#generateSm4Key').click(function() {
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/sm4/generate-key',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({}),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#sm4KeyResult', response.data.key);
+                    // 自动填充表单
+                    $('#sm4EncryptKey').val(response.data.key);
+                    $('#sm4DecryptKey').val(response.data.key);
+                } else {
+                    showResult('#sm4KeyResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#sm4KeyResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // SM4加密
+    $('#sm4EncryptBtn').click(function() {
+        const plaintext = $('#sm4EncryptPlaintext').val();
+        const key = $('#sm4EncryptKey').val();
+        const mode = $('#sm4EncryptMode').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!plaintext || !key) {
+            showResult('#sm4EncryptResult', '明文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/sm4/encrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                plaintext: plaintext,
+                key: key,
+                mode: mode
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#sm4EncryptResult', response.data.ciphertext);
+                    // 自动填充解密表单
+                    $('#sm4DecryptCiphertext').val(response.data.ciphertext);
+                    $('#sm4DecryptMode').val(mode);
+                } else {
+                    showResult('#sm4EncryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#sm4EncryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // SM4解密
+    $('#sm4DecryptBtn').click(function() {
+        const ciphertext = $('#sm4DecryptCiphertext').val();
+        const key = $('#sm4DecryptKey').val();
+        const mode = $('#sm4DecryptMode').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!ciphertext || !key) {
+            showResult('#sm4DecryptResult', '密文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/sm4/decrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                ciphertext: ciphertext,
+                key: key,
+                mode: mode
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#sm4DecryptResult', response.data.plaintext);
+                } else {
+                    showResult('#sm4DecryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#sm4DecryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RC6密钥生成
+    $('#generateRc6Key').click(function() {
+        const button = this;
+        const originalText = $(button).html();
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/rc6/generate-key',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({}),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rc6KeyResult', response.data.key);
+                    // 自动填充表单
+                    $('#rc6EncryptKey').val(response.data.key);
+                    $('#rc6DecryptKey').val(response.data.key);
+                } else {
+                    showResult('#rc6KeyResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rc6KeyResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RC6加密
+    $('#rc6EncryptBtn').click(function() {
+        const plaintext = $('#rc6EncryptPlaintext').val();
+        const key = $('#rc6EncryptKey').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!plaintext || !key) {
+            showResult('#rc6EncryptResult', '明文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/rc6/encrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                plaintext: plaintext,
+                key: key
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rc6EncryptResult', response.data.ciphertext);
+                    // 自动填充解密表单
+                    $('#rc6DecryptCiphertext').val(response.data.ciphertext);
+                } else {
+                    showResult('#rc6EncryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rc6EncryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+    
+    // RC6解密
+    $('#rc6DecryptBtn').click(function() {
+        const ciphertext = $('#rc6DecryptCiphertext').val();
+        const key = $('#rc6DecryptKey').val();
+        const button = this;
+        const originalText = $(button).html();
+        
+        if (!ciphertext || !key) {
+            showResult('#rc6DecryptResult', '密文和密钥不能为空', false);
+            return;
+        }
+        
+        showLoading(button);
+        
+        $.ajax({
+            url: '/api/symmetric/rc6/decrypt',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ 
+                ciphertext: ciphertext,
+                key: key
+            }),
+            success: function(response) {
+                if (response.success) {
+                    showResult('#rc6DecryptResult', response.data.plaintext);
+                } else {
+                    showResult('#rc6DecryptResult', response.message, false);
+                }
+                hideLoading(button, originalText);
+            },
+            error: function(xhr, status, error) {
+                showResult('#rc6DecryptResult', handleAjaxError(xhr, status, error), false);
+                hideLoading(button, originalText);
+            }
+        });
+    });
+});
+</script>
+{% endblock %} 

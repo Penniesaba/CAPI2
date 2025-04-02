@@ -1,0 +1,508 @@
+{% extends "base.html" %}
+
+{% block title %}对称加密算法原理 - 密码算法实现平台{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <h1><i class="fas fa-key me-2"></i>对称加密算法原理</h1>
+        <p class="lead">对称加密算法使用相同的密钥进行加密和解密，兼具高效性和安全性。</p>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-book me-2"></i>对称加密基本原理</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>基本概念</h4>
+                <p>对称加密算法是使用<strong>相同密钥</strong>进行加密和解密的密码算法。加密过程中，明文通过加密算法和密钥转换为密文；解密过程中，密文通过解密算法和相同的密钥还原为明文。</p>
+                
+                <div class="mt-4">
+                    <h4>对称加密算法分类</h4>
+                    <ol>
+                        <li><strong>分组密码</strong>：将明文分成固定长度的块进行加密，如AES、SM4、RC6等</li>
+                        <li><strong>流密码</strong>：逐位或逐字节进行加密，如RC4、ChaCha20等</li>
+                    </ol>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>工作模式</h4>
+                    <p>分组密码通常有多种工作模式，常见的包括：</p>
+                    <ul>
+                        <li><strong>ECB (Electronic Codebook)</strong>：最简单的模式，相同的明文块产生相同的密文块</li>
+                        <li><strong>CBC (Cipher Block Chaining)</strong>：每个明文块与前一个密文块进行XOR运算后再加密</li>
+                        <li><strong>CFB (Cipher Feedback)</strong>：将分组密码转变为流密码</li>
+                        <li><strong>OFB (Output Feedback)</strong>：生成密钥流，与明文进行XOR运算</li>
+                        <li><strong>CTR (Counter)</strong>：使用递增的计数器生成密钥流</li>
+                        <li><strong>GCM (Galois/Counter Mode)</strong>：CTR模式的扩展，提供认证功能</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>对称加密算法的优缺点</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card border-success mb-3">
+                                <div class="card-header bg-success text-white">优点</div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>计算速度快</li>
+                                        <li>加密效率高</li>
+                                        <li>密文扩展小</li>
+                                        <li>适合大量数据加密</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card border-danger mb-3">
+                                <div class="card-header bg-danger text-white">缺点</div>
+                                <div class="card-body">
+                                    <ul class="mb-0">
+                                        <li>密钥配送问题</li>
+                                        <li>密钥管理复杂</li>
+                                        <li>缺乏身份认证</li>
+                                        <li>密钥数量随通信对象增加</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">对称加密工作流程</h5>
+                        <img src="https://www.ssl2buy.com/wp-content/uploads/2015/12/Symmetric-Encryption.png" class="img-fluid mb-3" alt="对称加密工作流程">
+                        <ol>
+                            <li>发送方和接收方共享密钥</li>
+                            <li>发送方使用密钥加密明文</li>
+                            <li>加密后的密文通过不安全信道传输</li>
+                            <li>接收方使用相同密钥解密密文</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- AES算法 -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="fas fa-shield-alt me-2"></i>AES (高级加密标准)</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>简介</h4>
+                <p>AES (Advanced Encryption Standard) 是美国联邦政府采用的一种区块加密标准，由比利时密码学家Joan Daemen和Vincent Rijmen设计，又称Rijndael加密算法。</p>
+                
+                <div class="mt-4">
+                    <h4>算法特点</h4>
+                    <ul>
+                        <li>分组长度：128位（16字节）</li>
+                        <li>密钥长度：128位、192位或256位</li>
+                        <li>轮数：10轮(128位)、12轮(192位)或14轮(256位)</li>
+                        <li>运算基础：有限域GF(2^8)上的代数运算</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>AES加密流程</h4>
+                    <ol>
+                        <li><strong>初始轮密钥加</strong>：将明文与初始轮密钥进行XOR运算</li>
+                        <li><strong>轮函数</strong>（重复n-1轮）：
+                            <ul>
+                                <li>字节替代（SubBytes）：使用S盒替换每个字节</li>
+                                <li>行移位（ShiftRows）：将状态矩阵的行循环左移不同的位数</li>
+                                <li>列混合（MixColumns）：对状态矩阵的列进行线性变换</li>
+                                <li>轮密钥加（AddRoundKey）：将状态与轮密钥进行XOR运算</li>
+                            </ul>
+                        </li>
+                        <li><strong>最后一轮</strong>：
+                            <ul>
+                                <li>字节替代</li>
+                                <li>行移位</li>
+                                <li>轮密钥加（无列混合）</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>安全性</h4>
+                    <p>AES被广泛认为是安全的，迄今为止没有实用的攻击方法。最好的攻击方法是比穷举搜索（2^128次尝试）略好一些。</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">AES轮函数架构</h5>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/50/AES_%28Rijndael%29_Round_Function.png/220px-AES_%28Rijndael%29_Round_Function.png" class="img-fluid mb-3" alt="AES轮函数架构">
+                        <h5 class="mt-4">AES S盒</h5>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/AES-SubBytes.svg/320px-AES-SubBytes.svg.png" class="img-fluid" alt="AES S盒替换">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SM4算法 -->
+<div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+        <h5 class="mb-0"><i class="fas fa-dragon me-2"></i>SM4 (国密对称加密)</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>简介</h4>
+                <p>SM4（商密4）是中国国家密码管理局于2012年发布的分组密码标准，用于替代国际上的DES和AES算法，是我国自主设计的对称分组密码算法。</p>
+                
+                <div class="mt-4">
+                    <h4>算法特点</h4>
+                    <ul>
+                        <li>分组长度：128位（16字节）</li>
+                        <li>密钥长度：128位（16字节）</li>
+                        <li>轮数：32轮</li>
+                        <li>结构：非平衡Feistel网络结构</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>SM4加密流程</h4>
+                    <ol>
+                        <li><strong>密钥扩展</strong>：将128位主密钥扩展为32个32位轮密钥</li>
+                        <li><strong>数据处理</strong>：
+                            <ul>
+                                <li>将128位明文分为4个32位字（X0, X1, X2, X3）</li>
+                                <li>进行32轮迭代运算</li>
+                                <li>每轮运算：Xi+4 = Xi ⊕ T(Xi+1 ⊕ Xi+2 ⊕ Xi+3 ⊕ rki)</li>
+                                <li>T函数包括非线性变换τ和线性变换L</li>
+                            </ul>
+                        </li>
+                        <li><strong>逆序输出</strong>：输出(X35, X34, X33, X32)作为密文</li>
+                    </ol>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>SM4与AES比较</h4>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>特性</th>
+                                    <th>SM4</th>
+                                    <th>AES</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>算法结构</td>
+                                    <td>非平衡Feistel网络</td>
+                                    <td>SPN (替换-置换网络)</td>
+                                </tr>
+                                <tr>
+                                    <td>分组长度</td>
+                                    <td>128位</td>
+                                    <td>128位</td>
+                                </tr>
+                                <tr>
+                                    <td>密钥长度</td>
+                                    <td>128位</td>
+                                    <td>128/192/256位</td>
+                                </tr>
+                                <tr>
+                                    <td>轮数</td>
+                                    <td>32轮</td>
+                                    <td>10/12/14轮</td>
+                                </tr>
+                                <tr>
+                                    <td>安全性</td>
+                                    <td>高</td>
+                                    <td>高</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">SM4轮函数结构</h5>
+                        <img src="https://i.stack.imgur.com/t8V98.png" class="img-fluid mb-3" alt="SM4轮函数结构">
+                        <h5 class="mt-4">SM4应用场景</h5>
+                        <ul>
+                            <li>政府部门信息系统</li>
+                            <li>金融行业数据加密</li>
+                            <li>国产密码硬件</li>
+                            <li>国密SSL/TLS通信</li>
+                            <li>电子政务和电子商务</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- RC6算法 -->
+<div class="card mb-4">
+    <div class="card-header bg-success text-white">
+        <h5 class="mb-0"><i class="fas fa-lock me-2"></i>RC6算法</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-8">
+                <h4>简介</h4>
+                <p>RC6是由Ron Rivest、Matt Robshaw、Ray Sidney和Yiqun Lisa Yin设计的分组密码，是RC5的后继者，曾作为AES的候选算法之一。</p>
+                
+                <div class="mt-4">
+                    <h4>算法特点</h4>
+                    <ul>
+                        <li>参数表示：RC6-w/r/b
+                            <ul>
+                                <li>w：字长（通常为32位）</li>
+                                <li>r：轮数（通常为20轮）</li>
+                                <li>b：密钥长度（0到255字节）</li>
+                            </ul>
+                        </li>
+                        <li>分组长度：4w位（标准实现为128位）</li>
+                        <li>核心特点：使用数据依赖性的旋转和整数乘法</li>
+                    </ul>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>RC6加密流程</h4>
+                    <ol>
+                        <li><strong>初始化</strong>：将128位明文分为4个32位字(A, B, C, D)</li>
+                        <li><strong>预处理</strong>：
+                            <ul>
+                                <li>B = B + S[0]</li>
+                                <li>D = D + S[1]</li>
+                            </ul>
+                        </li>
+                        <li><strong>轮函数</strong>（重复r轮）：
+                            <ul>
+                                <li>t = (B×(2B+1)) ≪ log₂w</li>
+                                <li>u = (D×(2D+1)) ≪ log₂w</li>
+                                <li>A = ((A ⊕ t) ≪ u) + S[2i]</li>
+                                <li>C = ((C ⊕ u) ≪ t) + S[2i+1]</li>
+                                <li>(A, B, C, D) = (B, C, D, A)（循环左移）</li>
+                            </ul>
+                        </li>
+                        <li><strong>后处理</strong>：
+                            <ul>
+                                <li>A = A + S[2r+2]</li>
+                                <li>C = C + S[2r+3]</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+                
+                <div class="mt-4">
+                    <h4>RC6的特点</h4>
+                    <ul>
+                        <li><strong>数据依赖性旋转</strong>：提高抗差分密码分析能力</li>
+                        <li><strong>整数乘法</strong>：增加非线性性</li>
+                        <li><strong>简单结构</strong>：易于实现，适合软硬件实现</li>
+                        <li><strong>可变参数</strong>：灵活适应不同安全需求</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title">RC6演化历程</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">
+                                <strong>RC5 (1994)</strong><br>
+                                由Ron Rivest设计的参数化分组密码
+                            </li>
+                            <li class="list-group-item">
+                                <strong>RC6 (1998)</strong><br>
+                                对RC5的改进，增加整数乘法
+                            </li>
+                            <li class="list-group-item">
+                                <strong>AES竞赛</strong><br>
+                                RC6是AES的五个最终候选之一
+                            </li>
+                        </ul>
+                        
+                        <h5 class="mt-4">RC6与其他算法比较</h5>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>算法</th>
+                                        <th>特点</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>RC6</td>
+                                        <td>数据依赖旋转、整数乘法</td>
+                                    </tr>
+                                    <tr>
+                                        <td>AES</td>
+                                        <td>S盒替换、矩阵运算</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SM4</td>
+                                        <td>Feistel结构、国密标准</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 对称加密模式图解 -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h5 class="mb-0"><i class="fas fa-project-diagram me-2"></i>对称加密工作模式图解</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">ECB模式 (Electronic Codebook)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/ECB_encryption.svg/601px-ECB_encryption.svg.png" class="img-fluid" alt="ECB模式">
+                        <div class="mt-3">
+                            <p class="small">相同的明文块产生相同的密文块，缺乏扩散性</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">CBC模式 (Cipher Block Chaining)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/80/CBC_encryption.svg/601px-CBC_encryption.svg.png" class="img-fluid" alt="CBC模式">
+                        <div class="mt-3">
+                            <p class="small">每个明文块与前一个密文块异或后加密，需要初始向量(IV)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">CTR模式 (Counter)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/CTR_encryption_2.svg/601px-CTR_encryption_2.svg.png" class="img-fluid" alt="CTR模式">
+                        <div class="mt-3">
+                            <p class="small">将递增的计数器加密后与明文异或，支持并行处理</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">CFB模式 (Cipher Feedback)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/CFB_encryption.svg/601px-CFB_encryption.svg.png" class="img-fluid" alt="CFB模式">
+                        <div class="mt-3">
+                            <p class="small">将分组密码转为流密码，加密前一个密文块后与明文异或</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">OFB模式 (Output Feedback)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/OFB_encryption.svg/601px-OFB_encryption.svg.png" class="img-fluid" alt="OFB模式">
+                        <div class="mt-3">
+                            <p class="small">生成独立于明文和密文的密钥流，抗差错能力强</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">GCM模式 (Galois/Counter Mode)</div>
+                    <div class="card-body text-center">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/GCM-Galois_Counter_Mode_with_IV.svg/600px-GCM-Galois_Counter_Mode_with_IV.svg.png" class="img-fluid" alt="GCM模式">
+                        <div class="mt-3">
+                            <p class="small">CTR模式扩展，提供认证功能，广泛用于TLS</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 应用场景 -->
+<div class="card">
+    <div class="card-header bg-dark text-white">
+        <h5 class="mb-0"><i class="fas fa-check-circle me-2"></i>对称加密应用场景</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">数据加密</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">大型数据库加密</li>
+                            <li class="list-group-item">本地文件加密</li>
+                            <li class="list-group-item">云存储加密</li>
+                            <li class="list-group-item">磁盘全盘加密</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">通信安全</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">TLS/SSL会话加密</li>
+                            <li class="list-group-item">VPN通信加密</li>
+                            <li class="list-group-item">无线网络加密(WPA2/WPA3)</li>
+                            <li class="list-group-item">即时通讯加密</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-danger text-white">特殊应用</div>
+                    <div class="card-body">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">金融交易加密</li>
+                            <li class="list-group-item">智能卡和RFID</li>
+                            <li class="list-group-item">IoT设备通信</li>
+                            <li class="list-group-item">加密货币钱包保护</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %} 
